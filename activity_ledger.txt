@@ -1,0 +1,20 @@
+
+--------------------------------------------------
+Time       : Thu Jan 15 10:20:20 2026
+User       : dr
+Travel     : 3.0 km (car)
+AC Hours   : 1.0
+Screen     : 2.0
+Meals      : Home=2.0 Resto=1.0
+Water      : 1.8 L
+
+--- Renewable ---
+Solar Used : True (3.0 kW)
+Wind Used  : False (0.0 kW)
+Biogas Used: False (0.0 kWh)
+
+--- Result ---
+Gross CO2  : 5.99 kg
+Offset     : 12.3 kg
+Net CO2    : 0 kg
+--------------------------------------------------

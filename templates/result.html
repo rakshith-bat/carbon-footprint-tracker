@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carbon Footprint Result</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 50px;
+        }
+
+        h1 {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); color: #0ff;}
+            50% { transform: scale(1.1); color: #0f0;}
+            100% { transform: scale(1); color: #0ff;}
+        }
+
+        .results {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 20px #00f, 0 0 40px #0ff inset;
+            animation: glow 3s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px #0ff;}
+            100% { box-shadow: 0 0 30px #0ff;}
+        }
+
+        p {
+            font-size: 1.3em;
+            margin: 15px 0;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #0ff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0f0;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>🌿 Carbon Footprint Results 🔗</h1>
+    <div class="results">
+        <p><strong>Gross CO₂:</strong> {{ gross }} kg</p>
+        <p><strong>Renewable Offset:</strong> {{ offset }} kg</p>
+        <p><strong>Net CO₂:</strong> {{ net }} kg</p>
+
+        <form action="/">
+            <button type="submit">Go Back</button>
+        </form>
+    </div>
+</body>
+</html>

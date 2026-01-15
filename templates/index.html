@@ -1,19 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <meta charset="UTF-8">
+    <title>Carbon Footprint Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
+        h1 {
+            margin-top: 20px;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); color: #0ff;}
+            50% { transform: scale(1.1); color: #0f0;}
+            100% { transform: scale(1); color: #0ff;}
+        }
+
+        form {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 0 20px #00f, 0 0 40px #0ff inset;
+            animation: glow 3s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px #0ff;}
+            100% { box-shadow: 0 0 30px #0ff;}
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #0ff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0f0;
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        .renewable-fields {
+            display: none;
+            background: rgba(0,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
 <body>
-    <div class="App">
-        <header class="App-header">
-            <img src="{{ url_for('static', filename='Octocat.png') }}" class="App-logo" alt="logo" />
-            <p>
-                GitHub Codespaces <span class="heart">♥️</span> Flask
-            </p>
-            <p class="small">
-                Edit <code>templates/index.html</code> and refresh to see your changes!
-            </p>
-        </header>
-    </div>
-</body>
+    <h1>🌿 Carbon Footprint Tracker 🔗 Blockchain</h1>
 
+    <form action="/submit" method="post" id="carbonForm">
+        <label>User ID:</label>
+        <input type="text" name="user_id" required placeholder="Your Name or ID">
+
+        <label>Distance traveled (km):</label>
+        <input type="number" name="distance_km" step="0.1" min="0" required>
+
+        <label>Transport mode:</label>
+        <select name="transport" required>
+            <option value="car">Car</option>
+            <option value="bike">Bike</option>
+            <option value="public">Public Transport</option>
+            <option value="ev">EV</option>
+        </select>
+
+        <label>Screen hours/day:</label>
+        <input type="number" name="screen_hours" min="0" max="24" step="0.1" required>
+
+        <label>AC hours/day:</label>
+        <input type="number" name="ac_hours" min="0" max="24" step="0.1" required>
+
+        <label>Light usage hours/day:</label>
+        <input type="number" name="light_hours" min="0" max="24" step="0.1" required>
+
+        <label>TV hours/day:</label>
+        <input type="number" name="tv_hours" min="0" max="24" step="0.1" required>
+
+        <label>Home meals/day:</label>
+        <input type="number" name="home_meals" min="0" step="1" required>
+
+        <label>Restaurant meals/day:</label>
+        <input type="number" name="resto_meals" min="0" step="1" required>
+
+        <label>Processed water used (liters/day):</label>
+        <input type="number" name="processed_water_liters" min="0" step="0.1" required>
+
+        <!-- Renewable energy options -->
+        <label>Do you use solar energy?</label>
+        <select name="solar_used" id="solar_used">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
+        <div class="renewable-fields" id="solar_fields">
+            <label>Solar panel capacity (kW):</label>
+            <input type="number" name="solar_kw" min="0" step="0.1" value="0">
+        </div>
+
+        <label>Do you use wind energy?</label>
+        <select name="wind_used" id="wind_used">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
+        <div class="renewable-fields" id="wind_fields">
+            <label>Wind turbine capacity (kW):</label>
+            <input type="number" name="wind_kw" min="0" step="0.1" value="0">
+        </div>
+
+        <label>Do you use biogas?</label>
+        <select name="biogas_used" id="biogas_used">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
+        <div class="renewable-fields" id="biogas_fields">
+            <label>Biogas daily output (kWh):</label>
+            <input type="number" name="biogas_kwh" min="0" step="0.1" value="0">
+        </div>
+
+        <button type="submit">Calculate Carbon Footprint</button>
+    </form>
+
+    <script>
+        // Show/hide renewable fields if user selects "Yes"
+        const solarSel = document.getElementById("solar_used");
+        const solarFields = document.getElementById("solar_fields");
+        solarSel.addEventListener("change", () => {
+            solarFields.style.display = solarSel.value === "yes" ? "block" : "none";
+        });
+
+        const windSel = document.getElementById("wind_used");
+        const windFields = document.getElementById("wind_fields");
+        windSel.addEventListener("change", () => {
+            windFields.style.display = windSel.value === "yes" ? "block" : "none";
+        });
+
+        const biogasSel = document.getElementById("biogas_used");
+        const biogasFields = document.getElementById("biogas_fields");
+        biogasSel.addEventListener("change", () => {
+            biogasFields.style.display = biogasSel.value === "yes" ? "block" : "none";
+        });
+
+        // Prevent entering >24 in hour inputs
+        const hourFields = document.querySelectorAll('input[name="screen_hours"], input[name="ac_hours"], input[name="light_hours"], input[name="tv_hours"]');
+        hourFields.forEach(field => {
+            field.addEventListener("input", () => {
+                if(field.value > 24) field.value = 24;
+                if(field.value < 0) field.value = 0;
+            });
+        });
+    </script>
+</body>
 </html>
