@@ -2,199 +2,127 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carbon Footprint Tracker</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
 
-        h1 {
-            margin-top: 20px;
-            text-align: center;
-            animation: pulse 2s infinite;
-        }
+    <!-- ---------- CSS ---------- -->
+    <link rel="stylesheet" href="static/css/style.css">
 
-        @keyframes pulse {
-            0% { transform: scale(1); color: #0ff;}
-            50% { transform: scale(1.1); color: #0f0;}
-            100% { transform: scale(1); color: #0ff;}
-        }
-
-        form {
-            background: rgba(255,255,255,0.05);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 0 20px #00f, 0 0 40px #0ff inset;
-            animation: glow 3s infinite alternate;
-        }
-
-        @keyframes glow {
-            0% { box-shadow: 0 0 10px #0ff;}
-            100% { box-shadow: 0 0 30px #0ff;}
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 8px;
-            border-radius: 8px;
-            border: none;
-            margin-bottom: 10px;
-        }
-
-        button {
-            padding: 12px 20px;
-            background: #0ff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #000;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #0f0;
-            color: #000;
-            transform: scale(1.05);
-        }
-
-        .renewable-fields {
-            display: none;
-            background: rgba(0,255,255,0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-    </style>
+    <!-- Three.js for 3D hero -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+    <!-- Hero robot JS -->
+    <script src="static/js/hero_robot.js" defer></script>
 </head>
 <body>
-     <!-- Hero 3D Robot -->
-  <div id="hero-3d-container" style="width: 100%; height: 600px;"></div>
 
-  <!-- Your existing content -->
-  <div id="main-content">
-    <!-- Existing forms / UI -->
-  </div>
+    <!-- Hero 3D Robot -->
+    <div id="hero-3d-container"></div>
 
-  <!-- Include Three.js & your hero script -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
-  <script src="{{ url_for('static', filename='js/hero_robot.js') }}"></script>
+    <!-- Main heading -->
     <h1>🌿 Carbon Footprint Tracker 🔗 Blockchain</h1>
 
+    <!-- Form -->
     <form action="/submit" method="post" id="carbonForm">
-        <label>User ID:</label>
-        <input type="text" name="user_id" required placeholder="Your Name or ID">
 
-        <label>Distance traveled (km):</label>
-        <input type="number" name="distance_km" step="0.1" min="0" required>
+        <!-- User ID -->
+        <label for="user_id">User ID:</label>
+        <input type="text" id="user_id" name="user_id" required placeholder="Your Name or ID">
 
-        <label>Transport mode:</label>
-        <select name="transport" required>
+        <!-- Distance -->
+        <label for="distance_km">Distance traveled (km):</label>
+        <input type="number" id="distance_km" name="distance_km" step="0.1" min="0" required>
+
+        <!-- Transport -->
+        <label for="transport">Transport mode:</label>
+        <select id="transport" name="transport" required>
             <option value="car">Car</option>
             <option value="bike">Bike</option>
             <option value="public">Public Transport</option>
             <option value="ev">EV</option>
         </select>
 
-        <label>Screen hours/day:</label>
-        <input type="number" name="screen_hours" min="0" max="24" step="0.1" required>
+        <!-- Screen / AC / Light / TV hours -->
+        <label for="screen_hours">Screen hours/day:</label>
+        <input type="number" id="screen_hours" name="screen_hours" min="0" max="24" step="0.1" required>
 
-        <label>AC hours/day:</label>
-        <input type="number" name="ac_hours" min="0" max="24" step="0.1" required>
+        <label for="ac_hours">AC hours/day:</label>
+        <input type="number" id="ac_hours" name="ac_hours" min="0" max="24" step="0.1" required>
 
-        <label>Light usage hours/day:</label>
-        <input type="number" name="light_hours" min="0" max="24" step="0.1" required>
+        <label for="light_hours">Light usage hours/day:</label>
+        <input type="number" id="light_hours" name="light_hours" min="0" max="24" step="0.1" required>
 
-        <label>TV hours/day:</label>
-        <input type="number" name="tv_hours" min="0" max="24" step="0.1" required>
+        <label for="tv_hours">TV hours/day:</label>
+        <input type="number" id="tv_hours" name="tv_hours" min="0" max="24" step="0.1" required>
 
-        <label>Home meals/day:</label>
-        <input type="number" name="home_meals" min="0" step="1" required>
+        <!-- Meals -->
+        <label for="home_meals">Home meals/day:</label>
+        <input type="number" id="home_meals" name="home_meals" min="0" step="1" required>
 
-        <label>Restaurant meals/day:</label>
-        <input type="number" name="resto_meals" min="0" step="1" required>
+        <label for="resto_meals">Restaurant meals/day:</label>
+        <input type="number" id="resto_meals" name="resto_meals" min="0" step="1" required>
 
-        <label>Processed water used (liters/day):</label>
-        <input type="number" name="processed_water_liters" min="0" step="0.1" required>
+        <!-- Water -->
+        <label for="processed_water_liters">Processed water used (liters/day):</label>
+        <input type="number" id="processed_water_liters" name="processed_water_liters" min="0" step="0.1" required>
 
         <!-- Renewable energy options -->
-        <label>Do you use solar energy?</label>
-        <select name="solar_used" id="solar_used">
+        <label for="solar_used">Do you use solar energy?</label>
+        <select id="solar_used" name="solar_used">
             <option value="no">No</option>
             <option value="yes">Yes</option>
         </select>
         <div class="renewable-fields" id="solar_fields">
-            <label>Solar panel capacity (kW):</label>
-            <input type="number" name="solar_kw" min="0" step="0.1" value="0">
+            <label for="solar_kw">Solar panel capacity (kW):</label>
+            <input type="number" id="solar_kw" name="solar_kw" min="0" step="0.1" value="0">
         </div>
 
-        <label>Do you use wind energy?</label>
-        <select name="wind_used" id="wind_used">
+        <label for="wind_used">Do you use wind energy?</label>
+        <select id="wind_used" name="wind_used">
             <option value="no">No</option>
             <option value="yes">Yes</option>
         </select>
         <div class="renewable-fields" id="wind_fields">
-            <label>Wind turbine capacity (kW):</label>
-            <input type="number" name="wind_kw" min="0" step="0.1" value="0">
+            <label for="wind_kw">Wind turbine capacity (kW):</label>
+            <input type="number" id="wind_kw" name="wind_kw" min="0" step="0.1" value="0">
         </div>
 
-        <label>Do you use biogas?</label>
-        <select name="biogas_used" id="biogas_used">
+        <label for="biogas_used">Do you use biogas?</label>
+        <select id="biogas_used" name="biogas_used">
             <option value="no">No</option>
             <option value="yes">Yes</option>
         </select>
         <div class="renewable-fields" id="biogas_fields">
-            <label>Biogas daily output (kWh):</label>
-            <input type="number" name="biogas_kwh" min="0" step="0.1" value="0">
+            <label for="biogas_kwh">Biogas daily output (kWh):</label>
+            <input type="number" id="biogas_kwh" name="biogas_kwh" min="0" step="0.1" value="0">
         </div>
 
+        <!-- Submit button -->
         <button type="submit">Calculate Carbon Footprint</button>
+
     </form>
 
+    <!-- JS for renewable field toggle and input limits -->
     <script>
-        // Show/hide renewable fields if user selects "Yes"
-        const solarSel = document.getElementById("solar_used");
-        const solarFields = document.getElementById("solar_fields");
-        solarSel.addEventListener("change", () => {
-            solarFields.style.display = solarSel.value === "yes" ? "block" : "none";
-        });
+        const toggleField = (selectId, fieldId) => {
+            const sel = document.getElementById(selectId);
+            const fld = document.getElementById(fieldId);
+            sel.addEventListener("change", () => fld.style.display = sel.value === "yes" ? "block" : "none");
+        }
 
-        const windSel = document.getElementById("wind_used");
-        const windFields = document.getElementById("wind_fields");
-        windSel.addEventListener("change", () => {
-            windFields.style.display = windSel.value === "yes" ? "block" : "none";
-        });
+        toggleField("solar_used", "solar_fields");
+        toggleField("wind_used", "wind_fields");
+        toggleField("biogas_used", "biogas_fields");
 
-        const biogasSel = document.getElementById("biogas_used");
-        const biogasFields = document.getElementById("biogas_fields");
-        biogasSel.addEventListener("change", () => {
-            biogasFields.style.display = biogasSel.value === "yes" ? "block" : "none";
-        });
-
-        // Prevent entering >24 in hour inputs
-        const hourFields = document.querySelectorAll('input[name="screen_hours"], input[name="ac_hours"], input[name="light_hours"], input[name="tv_hours"]');
-        hourFields.forEach(field => {
-            field.addEventListener("input", () => {
-                if(field.value > 24) field.value = 24;
-                if(field.value < 0) field.value = 0;
+        // Restrict hours between 0-24
+        const hourFields = ["screen_hours","ac_hours","light_hours","tv_hours"];
+        hourFields.forEach(id => {
+            const f = document.getElementById(id);
+            f.addEventListener("input", () => {
+                if(f.value < 0) f.value = 0;
+                if(f.value > 24) f.value = 24;
             });
         });
     </script>
+
 </body>
 </html>

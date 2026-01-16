@@ -6,6 +6,14 @@ import os
 app = Flask(__name__)
 bc = EnergyChain()
 
+#to accept float value
+def f3(value):
+    """Safely convert input to float with 3 decimal places"""
+    try:
+        return round(float(value), 3)
+    except (TypeError, ValueError):
+        return 0.0
+
 # -------------------------
 # Carbon calculation functions
 # -------------------------
@@ -90,46 +98,51 @@ def home():
 def submit():
     data = request.form
 
-    # User activity
+    # User activity (rounded to 3 decimals)
     activity_data = {
-        "distance_km": float(data.get("distance_km", 0)),
+        "distance_km": f3(data.get("distance_km")),
         "transport": data.get("transport"),
-        "screen_hours": float(data.get("screen_hours", 0)),
-        "ac_hours": float(data.get("ac_hours", 0)),
-        "light_hours": float(data.get("light_hours", 0)),
-        "tv_hours": float(data.get("tv_hours", 0)),
-        "home_meals": float(data.get("home_meals", 0)),
-        "resto_meals": float(data.get("resto_meals", 0)),
-        "water_liters": float(data.get("processed_water_liters", 0))  # fixed
+        "screen_hours": f3(data.get("screen_hours")),
+        "ac_hours": f3(data.get("ac_hours")),
+        "light_hours": f3(data.get("light_hours")),
+        "tv_hours": f3(data.get("tv_hours")),
+        "home_meals": f3(data.get("home_meals")),
+        "resto_meals": f3(data.get("resto_meals")),
+        "water_liters": f3(data.get("processed_water_liters"))
     }
 
-    # Renewable info
+    # Renewable info (also rounded)
     renew_data = {
         "solar_used": data.get("solar_used") == "yes",
         "wind_used": data.get("wind_used") == "yes",
         "biogas_used": data.get("biogas_used") == "yes",
-        "solar_kw": float(data.get("solar_kw") or 0),   # safe fix
-        "wind_kw": float(data.get("wind_kw") or 0),     # safe fix
-        "biogas_kwh": float(data.get("biogas_kwh") or 0) # safe fix
+        "solar_kw": f3(data.get("solar_kw")),
+        "wind_kw": f3(data.get("wind_kw")),
+        "biogas_kwh": f3(data.get("biogas_kwh"))
     }
 
     gross = calculate_gross_co2(activity_data)
     offset, kwh = calculate_renewable_offset(renew_data)
-    net = max(gross - offset, 0)
+    net = max(round(gross - offset, 3), 0)
 
-    # Write ledger
-    write_audit_ledger(data.get("user_id", "U1"), activity_data, renew_data, gross, offset, net)
+    write_audit_ledger(
+        data.get("user_id", "U1"),
+        activity_data,
+        renew_data,
+        gross,
+        offset,
+        net
+    )
 
-    # Update blockchain
     bc.buy_energy(data.get("user_id", "U1"), net, kwh)
 
-    return render_template("result.html", gross=gross, offset=offset, net=net)
+    return render_template(
+        "result.html",
+        gross=round(gross, 3),
+        offset=round(offset, 3),
+        net=round(net, 3)
+    )
 
-
-# -------------------------
-# Test route
-# -------------------------
-@app.route("/test", methods=["GET"])
 def test_run():
     # Sample dummy data
     activity_data = {

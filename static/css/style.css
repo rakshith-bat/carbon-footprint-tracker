@@ -1,0 +1,92 @@
+/* === General Page Theme === */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f1015, #1a1a2e, #0a0a1f);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* === Hero Container === */
+#hero-3d-container {
+    width: 100%;
+    height: 600px;
+    position: relative;
+    perspective: 1000px; /* 3D depth */
+}
+
+/* === Heading === */
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin: 20px 0;
+    letter-spacing: 1px;
+    color: #00ffe1;
+    text-shadow: 0 0 10px #00ffe1, 0 0 20px #0ff;
+}
+
+/* === Form === */
+form {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 15px #00f, 0 0 30px #0ff inset;
+}
+
+/* === Labels and Inputs === */
+label {
+    display: block;
+    margin: 8px 0 4px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 40%;
+    padding: 6px 8px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 0.95rem;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    box-shadow: 0 0 5px #0ff inset;
+}
+
+/* === Button === */
+button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    background: #0ff;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #0f0;
+    transform: scale(1.05);
+}
+
+/* === Glowing Eye Effect (robot eyes) === */
+.robot-eye {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #ff0000; /* red part */
+    box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4d4d;
+    position: absolute;
+}
+
+/* === Optional Animations === */
+@keyframes blink {
+    0%, 20%, 40%, 60%, 80%, 100% { transform: scaleY(1); }
+    10%, 30%, 50%, 70%, 90% { transform: scaleY(0.1); }
+}
