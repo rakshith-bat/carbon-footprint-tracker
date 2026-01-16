@@ -19,12 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
     container.appendChild(renderer.domElement);
 
     // ====== LIGHTS ======
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(5, 10, 5);
+    const pointLight = new THREE.PointLight(0xffffff, 1.5);
+    pointLight.position.set(3, 5, 5);
     scene.add(pointLight);
+
 
     // ====== LOW-POLY WALL-E STYLE ROBOT ======
     const robot = new THREE.Group();
@@ -64,6 +65,16 @@ document.addEventListener("DOMContentLoaded", () => {
     robot.add(leftArm, rightArm);
 
     scene.add(robot);
+    robot.position.y = -0.5;
+    camera.lookAt(robot.position);
+
+    // ====== MOUSE TRACKING ======
+    let mouse = {};
+    container.addEventListener("mousemove", (event) => {
+    const rect = container.getBoundingClientRect();
+    mouse.x = event.clientX - rect.left;
+    mouse.y = event.clientY - rect.top;
+});
 
     // ====== ANIMATION ======
     let clock = new THREE.Clock();
@@ -101,12 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     animate();
 
-    // ====== MOUSE TRACKING ======
-    let mouse = {};
-    container.addEventListener("mousemove", (event) => {
-        mouse.x = event.clientX;
-        mouse.y = event.clientY;
-    });
+    
 
     // ====== HANDLE RESIZE ======
     window.addEventListener("resize", () => {

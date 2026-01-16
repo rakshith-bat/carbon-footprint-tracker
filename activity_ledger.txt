@@ -38,3 +38,43 @@ Gross CO2  : 14.71 kg
 Offset     : 2.71 kg
 Net CO2    : 12.0 kg
 --------------------------------------------------
+
+--------------------------------------------------
+Time       : Fri Jan 16 16:41:09 2026
+User       : iioi
+Travel     : 6.0 km (car)
+AC Hours   : 6.0
+Screen     : 6.0
+Meals      : Home=1.0 Resto=3.0
+Water      : 3.0 L
+
+--- Renewable ---
+Solar Used : False (0.0 kW)
+Wind Used  : False (0.0 kW)
+Biogas Used: False (0.0 kWh)
+
+--- Result ---
+Gross CO2  : 19.06 kg
+Offset     : 0.0 kg
+Net CO2    : 19.06 kg
+--------------------------------------------------
+
+--------------------------------------------------
+Time       : Fri Jan 16 16:41:50 2026
+User       : 7
+Travel     : 7.0 km (car)
+AC Hours   : 6.0
+Screen     : 8.0
+Meals      : Home=6.0 Resto=4.0
+Water      : 5.8 L
+
+--- Renewable ---
+Solar Used : True (3.0 kW)
+Wind Used  : True (0.3 kW)
+Biogas Used: False (0.0 kWh)
+
+--- Result ---
+Gross CO2  : 24.91 kg
+Offset     : 14.27 kg
+Net CO2    : 10.64 kg
+--------------------------------------------------

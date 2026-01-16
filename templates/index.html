@@ -5,6 +5,12 @@
 <title>Carbon Footprint Tracker</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <style>
+
+select option {
+    background: #0f0f1e;
+    color: #ffffff;
+}
+
 body {
     font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #0f0f1e, #1b1b2f, #0f0f1e);
@@ -46,37 +52,54 @@ h1 {
 
 /* Hero container */
 #hero-3d-container {
-    width: 400px;
-    height: 500px;
+    width: 380px;
+    height: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 
 /* Input columns */
 .input-column {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     flex: 1;
+    max-width: 420px;
 }
 
-input, select, button {
-    height: 35px;
-    padding: 5px 10px;
+
+input, select {
+    height: 42px;
+    padding: 8px 12px;
+    font-size: 15px;
     border-radius: 6px;
     border: none;
-    background: rgba(0,255,255,0.1);
-    color: #fff;
-    font-weight: bold;
-    box-shadow: 0 0 5px #0ff;
+    background: rgba(0,255,255,0.15);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 0 6px #0ff;
     animation: flicker 3s infinite alternate;
 }
+select option {
+    background: #0f0f1e;
+    color: #ffffff;
+}
+
 
 input::placeholder { color: #ccc; }
 
 button {
-    background: #0ff;
+    height: 48px;
+    font-size: 16px;
+    font-weight: bold;
+    background: linear-gradient(90deg, #26f4d0, #0ff);
     color: #000;
     cursor: pointer;
+    margin-top: 10px;
 }
+
 
 button:hover {
     transform: scale(1.05);
@@ -85,7 +108,7 @@ button:hover {
 
 .renewable-fields {
     display: none;
-    background: rgba(0,255,255,0.1);
+    background: rgba(6, 255, 255, 0.1);
     padding: 8px;
     border-radius: 6px;
 }
