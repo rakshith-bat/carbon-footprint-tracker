@@ -1,151 +1,117 @@
-// ---- Three.js setup ----
-const container = document.getElementById("hero-3d-container");
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0f2027);
+document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("hero-3d-container");
+    if (!container) return; // Stop if container not found
 
-const camera = new THREE.PerspectiveCamera(
-  45,
-  container.clientWidth / container.clientHeight,
-  0.1,
-  1000
-);
-camera.position.set(0, 2, 8);
+    // ====== THREE.JS SCENE SETUP ======
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f2027);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(container.clientWidth, container.clientHeight);
-container.appendChild(renderer.domElement);
+    const camera = new THREE.PerspectiveCamera(
+        75,
+        container.clientWidth / container.clientHeight,
+        0.1,
+        1000
+    );
+    camera.position.set(0, 2, 5);
 
-// ---- Lighting ----
-const ambient = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambient);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
 
-const directional = new THREE.DirectionalLight(0xffffff, 1);
-directional.position.set(5, 10, 7);
-scene.add(directional);
+    // ====== LIGHTS ======
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
 
-// ---- Robot Group ----
-const robot = new THREE.Group();
-scene.add(robot);
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(5, 10, 5);
+    scene.add(pointLight);
 
-// ---- Colors ----
-const yellow = 0xffd44d;
-const gray = 0x555555;
-const black = 0x000000;
-const red = 0xff4444;
-const screenColor = 0x00ffcc;
+    // ====== LOW-POLY WALL-E STYLE ROBOT ======
+    const robot = new THREE.Group();
 
-// ---- Torso ----
-const torsoGeo = new THREE.BoxGeometry(2, 3, 1);
-const torsoMat = new THREE.MeshStandardMaterial({ color: yellow });
-const torso = new THREE.Mesh(torsoGeo, torsoMat);
-robot.add(torso);
+    // Body
+    const bodyGeometry = new THREE.BoxGeometry(1.2, 1.5, 0.6);
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffff66 });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    robot.add(body);
 
-// ---- Screen on torso ----
-const screenGeo = new THREE.BoxGeometry(1, 1, 0.05);
-const screenMat = new THREE.MeshStandardMaterial({ color: screenColor });
-const screen = new THREE.Mesh(screenGeo, screenMat);
-screen.position.set(0, 0.2, 0.53);
-torso.add(screen);
+    // Head
+    const headGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.6);
+    const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffff66 });
+    const head = new THREE.Mesh(headGeometry, headMaterial);
+    head.position.set(0, 1.05, 0);
+    robot.add(head);
 
-// ---- Head ----
-const headGeo = new THREE.BoxGeometry(1.2, 1, 1);
-const headMat = new THREE.MeshStandardMaterial({ color: yellow });
-const head = new THREE.Mesh(headGeo, headMat);
-head.position.set(0, 2, 0);
-robot.add(head);
+    // Eyes
+    const leftEyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+    const rightEyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+    const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff4444 });
+    const leftEye = new THREE.Mesh(leftEyeGeometry, eyeMaterial);
+    const rightEye = new THREE.Mesh(rightEyeGeometry, eyeMaterial);
+    leftEye.position.set(-0.2, 1.1, 0.3);
+    rightEye.position.set(0.2, 1.1, 0.3);
+    robot.add(leftEye, rightEye);
 
-// ---- Eyes ----
-const eyeGeo = new THREE.SphereGeometry(0.2, 16, 16);
-const eyeMat = new THREE.MeshStandardMaterial({ color: black });
-const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    // Simple arms
+    const armGeometry = new THREE.CylinderGeometry(0.07, 0.07, 0.6);
+    const armMaterial = new THREE.MeshStandardMaterial({ color: 0x999999 });
+    const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+    const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+    leftArm.position.set(-0.85, 0.5, 0);
+    rightArm.position.set(0.85, 0.5, 0);
+    leftArm.rotation.z = Math.PI / 6;
+    rightArm.rotation.z = -Math.PI / 6;
+    robot.add(leftArm, rightArm);
 
-leftEye.position.set(-0.35, 0.2, 0.6);
-rightEye.position.set(0.35, 0.2, 0.6);
-head.add(leftEye);
-head.add(rightEye);
+    scene.add(robot);
 
-// ---- Arms ----
-function makeArm(x) {
-  const armGroup = new THREE.Group();
+    // ====== ANIMATION ======
+    let clock = new THREE.Clock();
 
-  const upper = new THREE.CylinderGeometry(0.15, 0.15, 1);
-  const upperMat = new THREE.MeshStandardMaterial({ color: yellow });
-  const upperMesh = new THREE.Mesh(upper, upperMat);
-  upperMesh.rotation.z = Math.PI / 2;
-  upperMesh.position.x = 0.5;
-  armGroup.add(upperMesh);
+    function animate() {
+        requestAnimationFrame(animate);
 
-  const hand = new THREE.BoxGeometry(0.4, 0.15, 0.15);
-  const handMesh = new THREE.Mesh(hand, gray);
-  handMesh.position.x = 1.1;
-  armGroup.add(handMesh);
+        const time = clock.getElapsedTime();
 
-  armGroup.position.set(x, 0.5, 0);
-  return armGroup;
-}
-robot.add(makeArm(-1.1));
-robot.add(makeArm(1.1));
+        // Random head tilt
+        head.rotation.y = Math.sin(time * 0.5) * 0.3;
+        head.rotation.x = Math.sin(time * 0.3) * 0.1;
 
-// ---- Legs / wheels ----
-const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.5, 16);
-const wheelMat = new THREE.MeshStandardMaterial({ color: gray });
-const leftWheel = new THREE.Mesh(wheelGeo, wheelMat);
-const rightWheel = new THREE.Mesh(wheelGeo, wheelMat);
+        // Eyes follow mouse
+        if (mouse.x !== undefined && mouse.y !== undefined) {
+            const vecX = (mouse.x / container.clientWidth) * 2 - 1;
+            const vecY = -(mouse.y / container.clientHeight) * 2 + 1;
+            leftEye.rotation.y = vecX * 0.3;
+            rightEye.rotation.y = vecX * 0.3;
+            leftEye.rotation.x = vecY * 0.3;
+            rightEye.rotation.x = vecY * 0.3;
+        }
 
-leftWheel.rotation.z = Math.PI / 2;
-rightWheel.rotation.z = Math.PI / 2;
+        // Random blinking
+        if (Math.random() < 0.01) {
+            leftEye.scale.y = 0.1;
+            rightEye.scale.y = 0.1;
+        } else {
+            leftEye.scale.y = 1;
+            rightEye.scale.y = 1;
+        }
 
-leftWheel.position.set(-0.7, -1.7, 0);
-rightWheel.position.set(0.7, -1.7, 0);
+        renderer.render(scene, camera);
+    }
 
-robot.add(leftWheel);
-robot.add(rightWheel);
+    animate();
 
-// ---- Animation ----
-let clock = new THREE.Clock();
-let eyeBlinkTimer = Math.random() * 2 + 1;
+    // ====== MOUSE TRACKING ======
+    let mouse = {};
+    container.addEventListener("mousemove", (event) => {
+        mouse.x = event.clientX;
+        mouse.y = event.clientY;
+    });
 
-// Cursor tracking
-let mouse = { x: 0, y: 0 };
-window.addEventListener("mousemove", (e) => {
-  const rect = container.getBoundingClientRect();
-  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-});
-
-function animate() {
-  requestAnimationFrame(animate);
-
-  const t = clock.getElapsedTime();
-
-  // Head subtle movement
-  head.rotation.y = Math.sin(t * 0.5) * 0.2;
-  head.rotation.x = Math.sin(t * 0.3) * 0.1;
-
-  // Eyes follow cursor
-  leftEye.lookAt(new THREE.Vector3(mouse.x * 2, mouse.y * 1, 5));
-  rightEye.lookAt(new THREE.Vector3(mouse.x * 2, mouse.y * 1, 5));
-
-  // Blinking
-  eyeBlinkTimer -= clock.getDelta();
-  if (eyeBlinkTimer <= 0) {
-    leftEye.scale.y = 0.05;
-    rightEye.scale.y = 0.05;
-    setTimeout(() => {
-      leftEye.scale.y = 1;
-      rightEye.scale.y = 1;
-    }, 150);
-    eyeBlinkTimer = Math.random() * 5 + 2;
-  }
-
-  renderer.render(scene, camera);
-}
-animate();
-
-// Handle resize
-window.addEventListener("resize", () => {
-  camera.aspect = container.clientWidth / container.clientHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(container.clientWidth, container.clientHeight);
+    // ====== HANDLE RESIZE ======
+    window.addEventListener("resize", () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
 });
