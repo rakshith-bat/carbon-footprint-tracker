@@ -84,6 +84,17 @@
     </style>
 </head>
 <body>
+     <!-- Hero 3D Robot -->
+  <div id="hero-3d-container" style="width: 100%; height: 600px;"></div>
+
+  <!-- Your existing content -->
+  <div id="main-content">
+    <!-- Existing forms / UI -->
+  </div>
+
+  <!-- Include Three.js & your hero script -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+  <script src="{{ url_for('static', filename='js/hero_robot.js') }}"></script>
     <h1>🌿 Carbon Footprint Tracker 🔗 Blockchain</h1>
 
     <form action="/submit" method="post" id="carbonForm">
