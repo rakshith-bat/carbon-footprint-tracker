@@ -54,7 +54,7 @@ h1 {
 .input-column {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
     flex: 1;
 }
 
@@ -70,9 +70,7 @@ input, select, button {
     animation: flicker 3s infinite alternate;
 }
 
-input::placeholder {
-    color: #ccc;
-}
+input::placeholder { color: #ccc; }
 
 button {
     background: #0ff;
@@ -85,6 +83,13 @@ button:hover {
     box-shadow: 0 0 15px #0ff;
 }
 
+.renewable-fields {
+    display: none;
+    background: rgba(0,255,255,0.1);
+    padding: 8px;
+    border-radius: 6px;
+}
+
 @keyframes flicker {
     0% { box-shadow: 0 0 5px #0ff; }
     50% { box-shadow: 0 0 15px #0ff; }
@@ -93,10 +98,7 @@ button:hover {
 
 /* For smaller screens */
 @media screen and (max-width: 900px) {
-    #main-container {
-        flex-direction: column;
-        align-items: center;
-    }
+    #main-container { flex-direction: column; align-items: center; }
     #hero-3d-container { margin-bottom: 20px; }
 }
 </style>
@@ -105,14 +107,15 @@ button:hover {
 
 <h1>🌿 Carbon Footprint Tracker 🔗 Blockchain</h1>
 
+<form action="/submit" method="post" id="carbonForm">
 <div id="main-container">
-    <!-- Left input column -->
+    <!-- Left column -->
     <div class="input-column">
         <label>User ID:</label>
         <input type="text" name="user_id" placeholder="Your Name or ID" required>
 
         <label>Distance traveled (km):</label>
-        <input type="number" name="distance_km" step="0.1" min="0" required>
+        <input type="number" name="distance_km" step="0.001" min="0" required>
 
         <label>Transport mode:</label>
         <select name="transport" required>
@@ -124,16 +127,16 @@ button:hover {
 
         <label>Screen hours/day:</label>
         <input type="number" name="screen_hours" min="0" max="24" step="0.1" required>
-    </div>
 
-    <!-- Hero 3D Robot -->
-    <div id="hero-3d-container"></div>
-
-    <!-- Right input column -->
-    <div class="input-column">
         <label>AC hours/day:</label>
         <input type="number" name="ac_hours" min="0" max="24" step="0.1" required>
+    </div>
 
+    <!-- Hero Robot -->
+    <div id="hero-3d-container"></div>
+
+    <!-- Right column -->
+    <div class="input-column">
         <label>Light usage hours/day:</label>
         <input type="number" name="light_hours" min="0" max="24" step="0.1" required>
 
@@ -146,15 +149,66 @@ button:hover {
         <label>Restaurant meals/day:</label>
         <input type="number" name="resto_meals" min="0" step="1" required>
 
-        <label>Processed water used (liters/day):</label>
+        <label>Processed water (liters/day):</label>
         <input type="number" name="processed_water_liters" min="0" step="0.1" required>
+
+        <!-- Renewable options -->
+        <label>Solar energy?</label>
+        <select name="solar_used" id="solar_used">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
+        <div class="renewable-fields" id="solar_fields">
+            <label>Solar panel (kW):</label>
+            <input type="number" name="solar_kw" min="0" step="0.1" value="0">
+        </div>
+
+        <label>Wind energy?</label>
+        <select name="wind_used" id="wind_used">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
+        <div class="renewable-fields" id="wind_fields">
+            <label>Wind turbine (kW):</label>
+            <input type="number" name="wind_kw" min="0" step="0.1" value="0">
+        </div>
+
+        <label>Biogas?</label>
+        <select name="biogas_used" id="biogas_used">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
+        <div class="renewable-fields" id="biogas_fields">
+            <label>Biogas output (kWh/day):</label>
+            <input type="number" name="biogas_kwh" min="0" step="0.1" value="0">
+        </div>
 
         <button type="submit">Calculate Carbon Footprint</button>
     </div>
 </div>
+</form>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
 <script src="{{ url_for('static', filename='js/hero_robot.js') }}"></script>
+
+<script>
+// Show/hide renewable fields
+['solar','wind','biogas'].forEach(type=>{
+    const sel = document.getElementById(type+'_used');
+    const field = document.getElementById(type+'_fields');
+    sel.addEventListener('change',()=>{ field.style.display = sel.value==='yes'?'block':'none'; });
+});
+</script>
+<script>
+// Prevent entering >24 or <0 in hour inputs
+const hourFields = document.querySelectorAll('input[name="screen_hours"], input[name="ac_hours"], input[name="light_hours"], input[name="tv_hours"]');
+hourFields.forEach(field => {
+    field.addEventListener('input', () => {
+        if (field.value > 24) field.value = 24;
+        if (field.value < 0) field.value = 0;
+    });
+});
+</script>
 
 </body>
 </html>
