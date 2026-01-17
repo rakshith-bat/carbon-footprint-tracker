@@ -10,14 +10,14 @@ renderer.setSize(container.clientWidth, container.clientHeight);
 container.appendChild(renderer.domElement);
 
 // Lighting
-const ambientLight = new THREE.AmbientLight(0x404040, 2);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.2); // Brighter ambient
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0x10b981, 1.5); // Emerald
+const directionalLight = new THREE.DirectionalLight(0x10b981, 2.5); // Emerald, stronger
 directionalLight.position.set(5, 5, 5);
 scene.add(directionalLight);
 
-const pointLight = new THREE.PointLight(0x06b6d4, 1, 100); // Cyan
+const pointLight = new THREE.PointLight(0x06b6d4, 1.5, 100); // Cyan, stronger
 pointLight.position.set(-5, 5, 5);
 scene.add(pointLight);
 
@@ -27,9 +27,9 @@ scene.add(robot);
 
 // Materials
 const metalMat = new THREE.MeshStandardMaterial({ 
-    color: 0x27272a, // Zinc-800
-    roughness: 0.3, 
-    metalness: 0.9 
+    color: 0xffffff, // Pure White
+    roughness: 0.2, 
+    metalness: 0.5 // Reduced metalness for brighter look
 });
 const glowMat = new THREE.MeshBasicMaterial({ color: 0x10b981 }); // Emerald
 const eyeMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 }); // Cyan

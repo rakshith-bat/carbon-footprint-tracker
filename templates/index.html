@@ -29,11 +29,12 @@
         </div>
         {% endif %}
 
-        <div class="dashboard-grid">
-            <!-- Left Column: Inputs -->
-            <div class="input-column cyber-panel" style="animation-delay: 0.1s;">
-                <h3>Emission Sources</h3>
-                <form method="POST" id="emission-form" action="/index">
+        <!-- Form wraps the entire grid to ensure all inputs are submitted -->
+        <form method="POST" id="emission-form" action="/index" onsubmit="document.getElementById('submit-btn').innerHTML = 'ENCRYPTING & UPLOADING...'; document.getElementById('submit-btn').classList.add('processing');">
+            <div class="dashboard-grid">
+                <!-- Left Column: Inputs -->
+                <div class="input-column cyber-panel" style="animation-delay: 0.1s;">
+                    <h3>Emission Sources</h3>
                     <!-- Transport -->
                     <div class="section" style="margin-bottom: 2rem;">
                         <label class="tooltip">Transport Mode <span class="tooltiptext">Select your primary mode of travel today</span></label>
@@ -69,80 +70,81 @@
                             </div>
                         </div>
                     </div>
-            </div>
-
-            <!-- Center Column: Robot -->
-            <div class="mascot-column" style="animation-delay: 0.2s;">
-                <div id="robot-canvas"></div>
-                <div class="mascot-message" id="mascot-text">
-                    "System Online. Awaiting emission data for blockchain synchronization."
-                </div>
-                
-                <div style="margin-top: 24px; display: flex; gap: 12px; width: 100%;">
-                    <a href="/leaderboard" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;">🏆 Leaderboard</a>
-                    <a href="/wallet" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;">👛 Wallet</a>
-                </div>
-                
-                <button type="submit" form="emission-form" class="cyber-btn glitch-btn" style="width: 100%; margin-top: 12px; height: 56px; font-size: 1rem;">
-                    COMMIT TO BLOCKCHAIN
-                </button>
-            </div>
-
-            <!-- Right Column: Lifestyle & Renewables -->
-            <div class="input-column cyber-panel" style="animation-delay: 0.3s;">
-                <h3>Lifestyle & Energy</h3>
-                
-                <!-- Food & Water -->
-                <div class="section" style="margin-bottom: 2rem;">
-                    <label>Consumption</label>
-                    <input type="number" name="home_meals" placeholder="Home Cooked Meals" min="0">
-                    <input type="number" name="restaurant_meals" placeholder="Restaurant Meals" min="0">
-                    <input type="number" name="water_liters" placeholder="Processed Water (L)" min="0">
                 </div>
 
-                <!-- Renewables -->
-                <div class="section">
-                    <label class="tooltip" style="margin-bottom: 1rem; display: block;">Renewable Generation <span class="tooltiptext">Electricity produced per day (units / kWh)</span></label>
-                    
-                    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <label style="margin: 0;">Solar Power</label>
-                            <select name="has_solar" class="toggle-trigger" data-target="solar_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
-                                <option value="no">No</option>
-                                <option value="yes">Yes</option>
-                            </select>
-                        </div>
-                        <input type="number" name="solar_kwh" id="solar_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
-                    </div>
-
-                    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <label style="margin: 0;">Wind Power</label>
-                            <select name="has_wind" class="toggle-trigger" data-target="wind_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
-                                <option value="no">No</option>
-                                <option value="yes">Yes</option>
-                            </select>
-                        </div>
-                        <input type="number" name="wind_kwh" id="wind_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                <!-- Center Column: Robot -->
+                <div class="mascot-column" style="animation-delay: 0.2s;">
+                    <div id="robot-canvas"></div>
+                    <div class="mascot-message" id="mascot-text">
+                        "System Online. Awaiting emission data for blockchain synchronization."
                     </div>
                     
-                    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <label style="margin: 0;">Biogas</label>
-                            <select name="has_biogas" class="toggle-trigger" data-target="biogas_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
-                                <option value="no">No</option>
-                                <option value="yes">Yes</option>
-                            </select>
+                    <div style="margin-top: 24px; display: flex; gap: 12px; width: 100%;">
+                        <a href="/leaderboard" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;">🏆 Leaderboard</a>
+                        <a href="/wallet" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;">👛 Wallet</a>
+                    </div>
+                    
+                    <button type="submit" id="submit-btn" class="cyber-btn glitch-btn" style="width: 100%; margin-top: 12px; height: 56px; font-size: 1rem;">
+                        COMMIT TO BLOCKCHAIN
+                    </button>
+                </div>
+
+                <!-- Right Column: Lifestyle & Renewables -->
+                <div class="input-column cyber-panel" style="animation-delay: 0.3s;">
+                    <h3>Lifestyle & Energy</h3>
+                    
+                    <!-- Food & Water -->
+                    <div class="section" style="margin-bottom: 2rem;">
+                        <label>Consumption</label>
+                        <input type="number" name="home_meals" placeholder="Home Cooked Meals" min="0">
+                        <input type="number" name="restaurant_meals" placeholder="Restaurant Meals" min="0">
+                        <input type="number" name="water_liters" placeholder="Processed Water (L)" min="0">
+                    </div>
+
+                    <!-- Renewables -->
+                    <div class="section">
+                        <label class="tooltip" style="margin-bottom: 1rem; display: block;">Renewable Generation <span class="tooltiptext">Electricity produced per day (units / kWh)</span></label>
+                        
+                        <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label style="margin: 0;">Solar Power</label>
+                                <select name="has_solar" class="toggle-trigger" data-target="solar_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                            <input type="number" name="solar_kwh" id="solar_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
                         </div>
-                        <input type="number" name="biogas_kwh" id="biogas_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
+
+                        <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label style="margin: 0;">Wind Power</label>
+                                <select name="has_wind" class="toggle-trigger" data-target="wind_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                            <input type="number" name="wind_kwh" id="wind_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label style="margin: 0;">Biogas</label>
+                                <select name="has_biogas" class="toggle-trigger" data-target="biogas_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
+                                    <option value="no">No</option>
+                                    <option value="yes">Yes</option>
+                                </select>
+                            </div>
+                            <input type="number" name="biogas_kwh" id="biogas_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                        </div>
                     </div>
                 </div>
-                </form>
             </div>
-        </div>
+        </form>
     </div>
 
     <script src="/static/js/hero_robot.js"></script>
     <script src="/static/js/dashboard.js"></script>
 </body>
 </html>
+git 
