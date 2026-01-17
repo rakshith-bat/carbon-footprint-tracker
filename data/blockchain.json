@@ -1,0 +1,29 @@
+[
+    {
+        "index": 1,
+        "timestamp": 1768647600.4962466,
+        "user_id": "SYSTEM",
+        "transaction_type": "GENESIS",
+        "data": {
+            "message": "Genesis Block"
+        },
+        "previous_hash": "0",
+        "nonce": 6,
+        "readable_summary": "The beginning of the Carbon Ledger.",
+        "hash": "0aa444197d31b8387a9f234ffccfa4a8dc237ea16263f13cfd68c6c353d78f23"
+    },
+    {
+        "index": 2,
+        "timestamp": 1768647794.630123,
+        "user_id": "tre",
+        "transaction_type": "reward",
+        "data": {
+            "credits": 10,
+            "reason": "Welcome Bonus"
+        },
+        "previous_hash": "8dca269c6508b88d1fb475e2109b1bb8c09aa615f58ee79ebaf7f8ceeeed1df9",
+        "nonce": 3,
+        "readable_summary": "User tre earned 10 Green Credits for eco-friendly behavior.",
+        "hash": "0faf889f35fb0d9c3f4953b47afcadfbcc794ccb522f09a4a28945d7e4de2006"
+    }
+]

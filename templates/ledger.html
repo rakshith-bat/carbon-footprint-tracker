@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonChain | Ledger</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="logo">
+            <h1 style="margin: 0; font-size: 1.5rem;">CARBON_CHAIN <span style="font-size: 0.5em; color: var(--accent-green); vertical-align: middle;">v2.0</span></h1>
+        </div>
+        <div class="nav-links">
+            <a href="/index">Tracker</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/wallet">Wallet</a>
+            <a href="/ledger" class="active">Ledger</a>
+            <a href="/leaderboard">Leaderboard</a>
+            <a href="/logout" style="color: var(--accent-red);">Logout</a>
+        </div>
+    </nav>
+
+    <div class="cyber-container">
+        <div class="cyber-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Immutable Ledger</h2>
+                <span style="font-family: 'JetBrains Mono'; color: var(--text-secondary); font-size: 0.8rem;">LIVE SYNC</span>
+            </div>
+            <p style="margin-bottom: 30px; color: var(--text-secondary);">
+                This is the permanent record of all energy transactions. Each block is cryptographically linked to the previous one.
+            </p>
+
+            <div style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
+                {% for block in chain|reverse %}
+                <div class="block-entry">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="color: var(--accent-cyan); font-weight: 700; font-family: 'JetBrains Mono';">BLOCK #{{ block.index }}</span>
+                        <span style="color: var(--text-secondary); font-size: 0.85rem;">{{ block.timestamp }}</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 16px; font-size: 1.1rem; line-height: 1.5;">
+                        {{ block.readable_summary }}
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.4); padding: 16px; border-radius: 8px; font-family: 'JetBrains Mono'; font-size: 0.8rem;">
+                        <div style="margin-bottom: 8px; display: grid; grid-template-columns: 120px 1fr; gap: 10px;">
+                            <span style="color: var(--text-secondary);">PREV HASH:</span>
+                            <span style="word-break: break-all; color: #666;">{{ block.previous_hash }}</span>
+                        </div>
+                        <div style="margin-bottom: 8px; display: grid; grid-template-columns: 120px 1fr; gap: 10px;">
+                            <span style="color: var(--text-secondary);">HASH:</span>
+                            <span style="word-break: break-all; color: var(--accent-green);">{{ block.hash }}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 10px;">
+                            <span style="color: var(--text-secondary);">NONCE:</span> 
+                            <span style="color: var(--accent-red);">{{ block.nonce }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

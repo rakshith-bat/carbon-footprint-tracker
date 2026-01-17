@@ -1,192 +1,225 @@
-from flask import Flask, render_template, request
-from blockchain import EnergyChain
-import time
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from config import Config
+from users import UserManager
+from blockchain import Blockchain
+from emissions import calculate_daily_emissions, calculate_green_credits
 import os
+import datetime
+import json
+import traceback
 
 app = Flask(__name__)
-bc = EnergyChain()
+app.config.from_object(Config)
 
-#to accept float value
-def f3(value):
-    """Safely convert input to float with 3 decimal places"""
-    try:
-        return round(float(value), 3)
-    except (TypeError, ValueError):
-        return 0.0
+# Initialize Systems
+user_manager = UserManager()
+blockchain = Blockchain()
 
-# -------------------------
-# Carbon calculation functions
-# -------------------------
-def calculate_gross_co2(data):
-    """
-    Calculates CO2 from 7 user activity factors
-    """
-    co2 = 0
-    # Transport
-    co2 += data["distance_km"] * 0.21  # per km, approximate for Bangalore
+# Ensure data files exist
+if not os.path.exists(Config.DATA_DIR):
+    os.makedirs(Config.DATA_DIR)
 
-    # Screen and electricity usage
-    co2 += data["screen_hours"] * 0.02
-    co2 += data["ac_hours"] * 1.5
-    co2 += data["light_hours"] * 0.06
-    co2 += data["tv_hours"] * 0.1
+@app.route('/')
+def root():
+    if 'user' in session:
+        return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
-    # Meals
-    co2 += data["home_meals"] * 0.5    # kg CO2 per home-cooked meal
-    co2 += data["resto_meals"] * 2.5   # kg CO2 per restaurant meal (includes energy & transport)
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    user = session['user']
+    
+    if request.method == 'POST':
+        try:
+            # Handle Emission Calculation
+            data = request.form.to_dict()
+            
+            # Server-side validation for hours (redundant safety)
+            for field in ['ac_hours', 'screen_hours', 'tv_hours', 'lighting_hours']:
+                try:
+                    val = float(data.get(field, 0) or 0)
+                    if val < 0 or val > 24:
+                        return render_template('index.html', user=user, error=f"Invalid input: {field} must be 0-24 hours")
+                except ValueError:
+                    pass
 
-    # Water
-    co2 += data["water_liters"] * 0.0003  # only processed water counts
+            results = calculate_daily_emissions(data)
+            credits = calculate_green_credits(results['net_emissions'], results['renewable_kwh'], results['eco_score'])
+            
+            # Record to Blockchain
+            # Detailed human-readable data
+            tx_data = {
+                'inputs': {k: v for k, v in data.items() if v and v != '0'},
+                'breakdown': results['breakdown'],
+                'gross': results['gross_emissions'],
+                'offset': results['renewable_offset'],
+                'net': results['net_emissions'],
+                'score': results['eco_score']
+            }
+            
+            blockchain.add_transaction(user, 'emission', tx_data)
+            
+            if credits > 0:
+                blockchain.add_transaction(user, 'reward', {'credits': credits, 'reason': 'Eco-Score Reward'})
+                
+            # Store results in session for the results page
+            session['last_results'] = results
+            session['last_credits'] = credits
+            
+            return redirect(url_for('results'))
+            
+        except Exception as e:
+            print(f"Error processing submission: {e}")
+            traceback.print_exc()
+            return render_template('index.html', user=user, error="An error occurred while processing your data. Please check your inputs.")
 
-    return round(co2, 2)
+    return render_template('index.html', user=user, balance=blockchain.get_user_balance(user))
 
+@app.route('/results')
+def results():
+    if 'user' not in session or 'last_results' not in session:
+        return redirect(url_for('index'))
+    
+    results = session['last_results']
+    credits = session.get('last_credits', 0)
+    
+    # Determine status
+    status = 'green' if results['eco_score'] >= 70 else 'yellow' if results['eco_score'] >= 40 else 'red'
+    
+    return render_template('results.html', results=results, credits=credits, status=status)
 
-def calculate_renewable_offset(renew):
-    """
-    Calculates CO2 offset from renewable capacity
-    """
-    total_kwh = 0
+@app.route('/dashboard')
+def dashboard():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    user = session['user']
+    balance = blockchain.get_user_balance(user)
+    
+    # Calculate stats
+    total_emissions = 0
+    tx_count = 0
+    recent_txs = []
+    
+    for block in reversed(blockchain.chain):
+        if block['user_id'] == user:
+            tx_count += 1
+            if block['transaction_type'] == 'emission':
+                total_emissions += block['data'].get('net', 0) # Updated key
+            
+            # Add to recent (limit 5)
+            if len(recent_txs) < 5:
+                ts = datetime.datetime.fromtimestamp(block['timestamp']).strftime('%Y-%m-%d %H:%M')
+                recent_txs.append({
+                    'timestamp': ts,
+                    'summary': block['readable_summary']
+                })
+                
+    return render_template('dashboard.html', 
+                         user=user, 
+                         balance=balance, 
+                         total_emissions=round(total_emissions, 2),
+                         transaction_count=tx_count,
+                         recent_transactions=recent_txs)
 
-    if renew["solar_used"]:
-        total_kwh += renew["solar_kw"] * 5  # avg sunlight hours/day
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        action = request.form.get('action')
 
-    if renew["wind_used"]:
-        total_kwh += renew["wind_kw"] * 8  # avg wind operation
+        if action == 'register':
+            success, msg = user_manager.register(username, password)
+            if success:
+                blockchain.add_transaction(username, 'reward', {'credits': 10, 'reason': 'Welcome Bonus'})
+                return render_template('login.html', message="Registered! Please login.")
+            else:
+                return render_template('login.html', error=msg)
+        
+        elif action == 'login':
+            if user_manager.login(username, password):
+                session['user'] = username
+                return redirect(url_for('index'))
+            else:
+                return render_template('login.html', error="Invalid credentials")
 
-    if renew["biogas_used"]:
-        total_kwh += renew["biogas_kwh"]
+    return render_template('login.html')
 
-    offset = total_kwh * 0.82  # 1 kWh ≈ 0.82 kg CO2
-    return round(offset, 2), round(total_kwh, 2)
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    session.pop('last_results', None)
+    return redirect(url_for('login'))
 
+@app.route('/wallet', methods=['GET', 'POST'])
+def wallet():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    user = session['user']
+    balance = blockchain.get_user_balance(user)
+    all_users = [u for u in user_manager.get_all_users() if u != user]
+    
+    if request.method == 'POST':
+        recipient = request.form.get('recipient')
+        try:
+            amount = float(request.form.get('amount'))
+        except ValueError:
+            return render_template('wallet.html', user=user, balance=balance, users=all_users, error="Invalid amount")
+        
+        if amount > balance:
+            return render_template('wallet.html', user=user, balance=balance, users=all_users, error="Insufficient funds")
+        
+        blockchain.add_transaction(user, 'exchange', {'recipient': recipient, 'amount': amount})
+        return redirect(url_for('wallet'))
 
-# -------------------------
-# Human-readable ledger
-# -------------------------
-def write_audit_ledger(user, activity, renew, gross, offset, net):
-    with open("activity_ledger.txt", "a") as f:
-        f.write("\n" + "-"*50 + "\n")
-        f.write(f"Time       : {time.ctime()}\n")
-        f.write(f"User       : {user}\n")
-        f.write(f"Travel     : {activity['distance_km']} km ({activity['transport']})\n")
-        f.write(f"AC Hours   : {activity['ac_hours']}\n")
-        f.write(f"Screen     : {activity['screen_hours']}\n")
-        f.write(f"Meals      : Home={activity['home_meals']} Resto={activity['resto_meals']}\n")
-        f.write(f"Water      : {activity['water_liters']} L\n")
+    return render_template('wallet.html', user=user, balance=balance, users=all_users)
 
-        f.write("\n--- Renewable ---\n")
-        f.write(f"Solar Used : {renew['solar_used']} ({renew['solar_kw']} kW)\n")
-        f.write(f"Wind Used  : {renew['wind_used']} ({renew['wind_kw']} kW)\n")
-        f.write(f"Biogas Used: {renew['biogas_used']} ({renew['biogas_kwh']} kWh)\n")
+@app.route('/ledger')
+def ledger():
+    chain_data = blockchain.chain
+    display_chain = []
+    for block in chain_data:
+        b = block.copy()
+        b['timestamp'] = datetime.datetime.fromtimestamp(block['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
+        display_chain.append(b)
+        
+    return render_template('ledger.html', chain=display_chain)
 
-        f.write("\n--- Result ---\n")
-        f.write(f"Gross CO2  : {gross} kg\n")
-        f.write(f"Offset     : {offset} kg\n")
-        f.write(f"Net CO2    : {net} kg\n")
-        f.write("-"*50 + "\n")
+@app.route('/leaderboard')
+def leaderboard():
+    users = user_manager.get_all_users()
+    stats = []
+    
+    for u in users:
+        bal = blockchain.get_user_balance(u)
+        total_emissions = 0
+        eco_score_avg = 0
+        count = 0
+        
+        for block in blockchain.chain:
+            if block['user_id'] == u and block['transaction_type'] == 'emission':
+                total_emissions += block['data'].get('net', 0)
+                eco_score_avg += block['data'].get('score', 0)
+                count += 1
+        
+        avg_score = round(eco_score_avg / count) if count > 0 else 0
+        
+        stats.append({
+            'username': u,
+            'balance': bal,
+            'total_emissions': round(total_emissions, 2),
+            'eco_score': avg_score
+        })
+    
+    # Sort by Eco Score (desc) then Balance
+    stats.sort(key=lambda x: (x['eco_score'], x['balance']), reverse=True)
+    
+    return render_template('leaderboard.html', stats=stats)
 
-
-# -------------------------
-# Routes
-# -------------------------
-@app.route("/")
-def home():
-    return render_template("index.html", title="Carbon Tracker")
-
-
-@app.route("/submit", methods=["POST"])
-def submit():
-    data = request.form
-
-    # User activity (rounded to 3 decimals)
-    activity_data = {
-        "distance_km": f3(data.get("distance_km")),
-        "transport": data.get("transport"),
-        "screen_hours": f3(data.get("screen_hours")),
-        "ac_hours": f3(data.get("ac_hours")),
-        "light_hours": f3(data.get("light_hours")),
-        "tv_hours": f3(data.get("tv_hours")),
-        "home_meals": f3(data.get("home_meals")),
-        "resto_meals": f3(data.get("resto_meals")),
-        "water_liters": f3(data.get("processed_water_liters"))
-    }
-
-    # Renewable info (also rounded)
-    renew_data = {
-        "solar_used": data.get("solar_used") == "yes",
-        "wind_used": data.get("wind_used") == "yes",
-        "biogas_used": data.get("biogas_used") == "yes",
-        "solar_kw": f3(data.get("solar_kw")),
-        "wind_kw": f3(data.get("wind_kw")),
-        "biogas_kwh": f3(data.get("biogas_kwh"))
-    }
-
-    gross = calculate_gross_co2(activity_data)
-    offset, kwh = calculate_renewable_offset(renew_data)
-    net = max(round(gross - offset, 3), 0)
-
-    write_audit_ledger(
-        data.get("user_id", "U1"),
-        activity_data,
-        renew_data,
-        gross,
-        offset,
-        net
-    )
-
-    bc.buy_energy(data.get("user_id", "U1"), net, kwh)
-
-    return render_template(
-        "result.html",
-        gross=round(gross, 3),
-        offset=round(offset, 3),
-        net=round(net, 3)
-    )
-
-def test_run():
-    # Sample dummy data
-    activity_data = {
-        "distance_km": 10,
-        "transport": "car",
-        "screen_hours": 3,
-        "ac_hours": 2,
-        "light_hours": 5,
-        "tv_hours": 2,
-        "home_meals": 2,
-        "resto_meals": 1,
-        "processed_water_liters": 5
-    }
-
-    renew_data = {
-        "solar_used": True,
-        "wind_used": False,
-        "biogas_used": True,
-        "solar_kw": 2.0,
-        "wind_kw": 0,
-        "biogas_kwh": 3.0
-    }
-
-    gross = calculate_gross_co2(activity_data)
-    offset, kwh = calculate_renewable_offset(renew_data)
-    net = max(gross - offset, 0)
-
-    # Write ledger (optional for test)
-    write_audit_ledger("TestUser", activity_data, renew_data, gross, offset, net)
-
-    # Blockchain update
-    bc.buy_energy("TestUser", net, kwh)
-
-    return {
-        "gross_co2": gross,
-        "renewable_offset": offset,
-        "net_co2": net,
-        "ledger_file": "activity_ledger.txt",
-        "blockchain_length": len(bc.chain)
-    }
-
-
-# -------------------------
-# Run app
-# -------------------------
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000, debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)

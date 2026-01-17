@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonChain | Login</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="cyber-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+        <div class="cyber-panel" style="width: 100%; max-width: 420px; padding: 40px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 1.8rem; margin-bottom: 10px;">CarbonChain<span style="color: var(--accent-green);">_ID</span></h1>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Secure Blockchain Access</p>
+            </div>
+            
+            {% if error %}
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9rem;">
+                {{ error }}
+            </div>
+            {% endif %}
+            
+            {% if message %}
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9rem;">
+                {{ message }}
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                <div style="margin-bottom: 20px;">
+                    <label>User Handle</label>
+                    <input type="text" name="username" required placeholder="Enter username..." style="margin-bottom: 0;">
+                </div>
+                <div style="margin-bottom: 30px;">
+                    <label>Access Key</label>
+                    <input type="password" name="password" required placeholder="Enter password..." style="margin-bottom: 0;">
+                </div>
+                
+                <div style="display: flex; gap: 16px;">
+                    <button type="submit" name="action" value="login" class="cyber-btn" style="flex: 1;">Login</button>
+                    <button type="submit" name="action" value="register" class="cyber-btn" style="flex: 1; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">Register</button>
+                </div>
+            </form>
+            
+            <div style="margin-top: 30px; font-size: 0.75rem; color: var(--text-secondary); text-align: center; font-family: 'JetBrains Mono'; opacity: 0.6;">
+                SECURE CONNECTION // SHA-256 ENCRYPTED
+            </div>
+        </div>
+    </div>
+</body>
+</html>

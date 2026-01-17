@@ -1,123 +1,130 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const container = document.getElementById("hero-3d-container");
-    if (!container) return; // Stop if container not found
+// Three.js Robot Mascot
+// Uses global THREE variable from CDN
 
-    // ====== THREE.JS SCENE SETUP ======
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0f2027);
+const container = document.getElementById('robot-canvas');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
-    const camera = new THREE.PerspectiveCamera(
-        75,
-        container.clientWidth / container.clientHeight,
-        0.1,
-        1000
-    );
-    camera.position.set(0, 2, 5);
+renderer.setSize(container.clientWidth, container.clientHeight);
+container.appendChild(renderer.domElement);
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
+// Lighting
+const ambientLight = new THREE.AmbientLight(0x404040, 2);
+scene.add(ambientLight);
 
-    // ====== LIGHTS ======
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-    scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0x10b981, 1.5); // Emerald
+directionalLight.position.set(5, 5, 5);
+scene.add(directionalLight);
 
-    const pointLight = new THREE.PointLight(0xffffff, 1.5);
-    pointLight.position.set(3, 5, 5);
-    scene.add(pointLight);
+const pointLight = new THREE.PointLight(0x06b6d4, 1, 100); // Cyan
+pointLight.position.set(-5, 5, 5);
+scene.add(pointLight);
 
+// Robot Group
+const robot = new THREE.Group();
+scene.add(robot);
 
-    // ====== LOW-POLY WALL-E STYLE ROBOT ======
-    const robot = new THREE.Group();
+// Materials
+const metalMat = new THREE.MeshStandardMaterial({ 
+    color: 0x27272a, // Zinc-800
+    roughness: 0.3, 
+    metalness: 0.9 
+});
+const glowMat = new THREE.MeshBasicMaterial({ color: 0x10b981 }); // Emerald
+const eyeMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 }); // Cyan
 
-    // Body
-    const bodyGeometry = new THREE.BoxGeometry(1.2, 1.5, 0.6);
-    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffff66 });
-    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    robot.add(body);
+// Head
+const headGeo = new THREE.BoxGeometry(1.2, 1, 1);
+const head = new THREE.Mesh(headGeo, metalMat);
+robot.add(head);
 
-    // Head
-    const headGeometry = new THREE.BoxGeometry(0.8, 0.6, 0.6);
-    const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffff66 });
-    const head = new THREE.Mesh(headGeometry, headMaterial);
-    head.position.set(0, 1.05, 0);
-    robot.add(head);
+// Eyes
+const eyeGeo = new THREE.SphereGeometry(0.15, 16, 16);
+const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+leftEye.position.set(-0.3, 0.1, 0.5);
+head.add(leftEye);
 
-    // Eyes
-    const leftEyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-    const rightEyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
-    const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff4444 });
-    const leftEye = new THREE.Mesh(leftEyeGeometry, eyeMaterial);
-    const rightEye = new THREE.Mesh(rightEyeGeometry, eyeMaterial);
-    leftEye.position.set(-0.2, 1.1, 0.3);
-    rightEye.position.set(0.2, 1.1, 0.3);
-    robot.add(leftEye, rightEye);
+const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+rightEye.position.set(0.3, 0.1, 0.5);
+head.add(rightEye);
 
-    // Simple arms
-    const armGeometry = new THREE.CylinderGeometry(0.07, 0.07, 0.6);
-    const armMaterial = new THREE.MeshStandardMaterial({ color: 0x999999 });
-    const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-    const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-    leftArm.position.set(-0.85, 0.5, 0);
-    rightArm.position.set(0.85, 0.5, 0);
-    leftArm.rotation.z = Math.PI / 6;
-    rightArm.rotation.z = -Math.PI / 6;
-    robot.add(leftArm, rightArm);
+// Antenna
+const antStemGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.5);
+const antStem = new THREE.Mesh(antStemGeo, metalMat);
+antStem.position.set(0, 0.75, 0);
+head.add(antStem);
 
-    scene.add(robot);
-    robot.position.y = -0.5;
-    camera.lookAt(robot.position);
+const antBulbGeo = new THREE.SphereGeometry(0.1);
+const antBulb = new THREE.Mesh(antBulbGeo, glowMat);
+antBulb.position.set(0, 1, 0);
+head.add(antBulb);
 
-    // ====== MOUSE TRACKING ======
-    let mouse = {};
-    container.addEventListener("mousemove", (event) => {
+// Body
+const bodyGeo = new THREE.CylinderGeometry(0.8, 0.6, 1.5, 8);
+const body = new THREE.Mesh(bodyGeo, metalMat);
+body.position.y = -1.4;
+robot.add(body);
+
+// Core (Glowing Heart)
+const coreGeo = new THREE.OctahedronGeometry(0.3);
+const core = new THREE.Mesh(coreGeo, glowMat);
+core.position.set(0, 0, 0.6);
+body.add(core);
+
+camera.position.z = 4;
+
+// Animation Variables
+let time = 0;
+const mouse = new THREE.Vector2();
+const targetRotation = new THREE.Vector2();
+
+// Mouse Tracking
+document.addEventListener('mousemove', (event) => {
+    // Normalize mouse position relative to canvas center
     const rect = container.getBoundingClientRect();
-    mouse.x = event.clientX - rect.left;
-    mouse.y = event.clientY - rect.top;
-});
-
-    // ====== ANIMATION ======
-    let clock = new THREE.Clock();
-
-    function animate() {
-        requestAnimationFrame(animate);
-
-        const time = clock.getElapsedTime();
-
-        // Random head tilt
-        head.rotation.y = Math.sin(time * 0.5) * 0.3;
-        head.rotation.x = Math.sin(time * 0.3) * 0.1;
-
-        // Eyes follow mouse
-        if (mouse.x !== undefined && mouse.y !== undefined) {
-            const vecX = (mouse.x / container.clientWidth) * 2 - 1;
-            const vecY = -(mouse.y / container.clientHeight) * 2 + 1;
-            leftEye.rotation.y = vecX * 0.3;
-            rightEye.rotation.y = vecX * 0.3;
-            leftEye.rotation.x = vecY * 0.3;
-            rightEye.rotation.x = vecY * 0.3;
-        }
-
-        // Random blinking
-        if (Math.random() < 0.01) {
-            leftEye.scale.y = 0.1;
-            rightEye.scale.y = 0.1;
-        } else {
-            leftEye.scale.y = 1;
-            rightEye.scale.y = 1;
-        }
-
-        renderer.render(scene, camera);
-    }
-
-    animate();
-
+    const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
     
-
-    // ====== HANDLE RESIZE ======
-    window.addEventListener("resize", () => {
-        camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(container.clientWidth, container.clientHeight);
-    });
+    mouse.set(x, y);
 });
+
+// Animation Loop
+function animate() {
+    requestAnimationFrame(animate);
+    time += 0.05;
+
+    // Breathing Animation (Scale & Position)
+    robot.position.y = Math.sin(time) * 0.1;
+    body.scale.x = 1 + Math.sin(time) * 0.02;
+    body.scale.z = 1 + Math.sin(time) * 0.02;
+
+    // Head Tracking (Smooth Lerp)
+    targetRotation.x = mouse.y * 0.5;
+    targetRotation.y = mouse.x * 0.5;
+
+    head.rotation.x += (targetRotation.x - head.rotation.x) * 0.1;
+    head.rotation.y += (targetRotation.y - head.rotation.y) * 0.1;
+
+    // Eye Movement (Subtle offset from head)
+    leftEye.position.x = -0.3 + mouse.x * 0.05;
+    leftEye.position.y = 0.1 + mouse.y * 0.05;
+    rightEye.position.x = 0.3 + mouse.x * 0.05;
+    rightEye.position.y = 0.1 + mouse.y * 0.05;
+
+    // Core Pulse
+    core.scale.setScalar(1 + Math.sin(time * 2) * 0.2);
+
+    renderer.render(scene, camera);
+}
+
+// Handle Resize
+window.addEventListener('resize', () => {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+});
+
+animate();

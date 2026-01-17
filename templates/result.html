@@ -2,78 +2,99 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Carbon Footprint Result</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding-top: 50px;
-        }
-
-        h1 {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); color: #0ff;}
-            50% { transform: scale(1.1); color: #0f0;}
-            100% { transform: scale(1); color: #0ff;}
-        }
-
-        .results {
-            background: rgba(255,255,255,0.05);
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 0 20px #00f, 0 0 40px #0ff inset;
-            animation: glow 3s infinite alternate;
-        }
-
-        @keyframes glow {
-            0% { box-shadow: 0 0 10px #0ff;}
-            100% { box-shadow: 0 0 30px #0ff;}
-        }
-
-        p {
-            font-size: 1.3em;
-            margin: 15px 0;
-        }
-
-        button {
-            padding: 12px 20px;
-            background: #0ff;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #000;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #0f0;
-            transform: scale(1.05);
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonChain | Results</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <h1>🌿 Carbon Footprint Results 🔗</h1>
-    <div class="results">
-        <p><strong>Gross CO₂:</strong> {{ gross }} kg</p>
-        <p><strong>Renewable Offset:</strong> {{ offset }} kg</p>
-        <p><strong>Net CO₂:</strong> {{ net }} kg</p>
+    <nav class="nav-bar">
+        <div class="logo">
+            <h1 style="margin: 0; font-size: 1.5rem;">CARBON_CHAIN <span style="font-size: 0.5em; color: var(--accent-green); vertical-align: middle;">v3.0</span></h1>
+        </div>
+        <div class="nav-links">
+            <a href="/index">Tracker</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/wallet">Wallet</a>
+            <a href="/ledger">Ledger</a>
+            <a href="/leaderboard">Leaderboard</a>
+            <a href="/logout" style="color: var(--accent-red);">Logout</a>
+        </div>
+    </nav>
 
-        <form action="/">
-            <button type="submit">Go Back</button>
-        </form>
+    <div class="cyber-container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+        <div class="cyber-panel" style="width: 100%; max-width: 800px; text-align: center; padding: 40px; animation: fadeInUp 0.5s ease-out;">
+            <h2 style="font-size: 2rem; margin-bottom: 10px;">Calculation Complete</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 40px;">Block #{{ results.block_index }} Mined Successfully</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px;">
+                <div style="background: rgba(255,255,255,0.03); padding: 24px; border-radius: 12px;">
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Net Footprint</div>
+                    <div style="font-size: 3rem; font-weight: 700; color: var(--text-primary); margin: 10px 0;">
+                        <span class="counter" data-target="{{ results.net_emissions }}">0</span> <span style="font-size: 1rem; color: var(--text-secondary);">kg</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--accent-red);">Gross: {{ results.gross_emissions }} kg</div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.03); padding: 24px; border-radius: 12px;">
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">Renewable Offset</div>
+                    <div style="font-size: 3rem; font-weight: 700; color: var(--accent-green); margin: 10px 0;">
+                        -<span class="counter" data-target="{{ results.renewable_offset }}">0</span> <span style="font-size: 1rem; color: var(--text-secondary);">kg</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--accent-green);">{{ results.renewable_kwh }} kWh Generated</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 40px;">
+                <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Eco-Score</div>
+                <div style="position: relative; display: inline-block;">
+                    <svg width="160" height="160" viewBox="0 0 160 160">
+                        <circle cx="80" cy="80" r="70" fill="none" stroke="#333" stroke-width="10" />
+                        <circle cx="80" cy="80" r="70" fill="none" stroke="{{ 'var(--accent-green)' if status == 'green' else 'var(--accent-cyan)' if status == 'yellow' else 'var(--accent-red)' }}" stroke-width="10" stroke-dasharray="440" stroke-dashoffset="{{ 440 - (results.eco_score / 100 * 440) }}" transform="rotate(-90 80 80)" style="transition: stroke-dashoffset 1s ease-out;" />
+                    </svg>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; font-weight: 700; color: {{ 'var(--accent-green)' if status == 'green' else 'var(--accent-cyan)' if status == 'yellow' else 'var(--accent-red)' }};">
+                        <span class="counter" data-target="{{ results.eco_score }}">0</span>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-family: 'JetBrains Mono'; color: {{ 'var(--accent-green)' if status == 'green' else 'var(--accent-cyan)' if status == 'yellow' else 'var(--accent-red)' }};">
+                    STATUS: {{ status|upper }}
+                </div>
+            </div>
+            
+            {% if credits > 0 %}
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); padding: 16px; border-radius: 8px; margin-bottom: 30px; animation: pulse 2s infinite;">
+                <h3 style="margin: 0; color: var(--accent-green);">+{{ credits }} Green Credits Earned!</h3>
+            </div>
+            {% endif %}
+            
+            <div style="display: flex; gap: 16px;">
+                <a href="/index" class="cyber-btn" style="flex: 1; text-decoration: none;">New Entry</a>
+                <a href="/ledger" class="cyber-btn" style="flex: 1; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary); text-decoration: none;">View Ledger</a>
+            </div>
+        </div>
     </div>
+
+    <script>
+        // Counter Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const duration = 1000; // ms
+                const increment = target / (duration / 16);
+                
+                let current = 0;
+                const updateCounter = () => {
+                    current += increment;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current);
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCounter();
+            });
+        });
+    </script>
 </body>
 </html>

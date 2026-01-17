@@ -1,237 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Carbon Footprint Tracker</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<style>
-
-select option {
-    background: #0f0f1e;
-    color: #ffffff;
-}
-
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0f0f1e, #1b1b2f, #0f0f1e);
-    color: #fff;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-h1 {
-    font-size: 2.2rem;
-    text-align: center;
-    margin: 15px 0;
-    background: linear-gradient(90deg, #fc6756, #f8cf3e, #26f4d0, #724ce8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-/* Main layout */
-#main-container {
-    display: flex;
-    width: 90%;
-    max-width: 1200px;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 40px;
-    margin-bottom: 50px;
-}
-
-/* Hero container */
-#hero-3d-container {
-    width: 380px;
-    height: 480px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-/* Input columns */
-.input-column {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    flex: 1;
-    max-width: 420px;
-}
-
-
-input, select {
-    height: 42px;
-    padding: 8px 12px;
-    font-size: 15px;
-    border-radius: 6px;
-    border: none;
-    background: rgba(0,255,255,0.15);
-    color: #ffffff;
-    font-weight: 600;
-    box-shadow: 0 0 6px #0ff;
-    animation: flicker 3s infinite alternate;
-}
-select option {
-    background: #0f0f1e;
-    color: #ffffff;
-}
-
-
-input::placeholder { color: #ccc; }
-
-button {
-    height: 48px;
-    font-size: 16px;
-    font-weight: bold;
-    background: linear-gradient(90deg, #26f4d0, #0ff);
-    color: #000;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-
-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px #0ff;
-}
-
-.renewable-fields {
-    display: none;
-    background: rgba(6, 255, 255, 0.1);
-    padding: 8px;
-    border-radius: 6px;
-}
-
-@keyframes flicker {
-    0% { box-shadow: 0 0 5px #0ff; }
-    50% { box-shadow: 0 0 15px #0ff; }
-    100% { box-shadow: 0 0 5px #0ff; }
-}
-
-/* For smaller screens */
-@media screen and (max-width: 900px) {
-    #main-container { flex-direction: column; align-items: center; }
-    #hero-3d-container { margin-bottom: 20px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonChain | Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
+    <nav class="nav-bar">
+        <div class="logo">
+            <h1 style="margin: 0; font-size: 1.5rem;">CARBON_CHAIN <span style="font-size: 0.5em; color: var(--accent-green); vertical-align: middle;">v3.0</span></h1>
+        </div>
+        <div class="nav-links">
+            <a href="/index" class="active">Tracker</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/wallet">Wallet</a>
+            <a href="/ledger">Ledger</a>
+            <a href="/leaderboard">Leaderboard</a>
+            <a href="/logout" style="color: var(--accent-red);">Logout [{{ user }}]</a>
+        </div>
+    </nav>
 
-<h1>🌿 Carbon Footprint Tracker 🔗 Blockchain</h1>
+    <div class="cyber-container">
+        {% if error %}
+        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
 
-<form action="/submit" method="post" id="carbonForm">
-<div id="main-container">
-    <!-- Left column -->
-    <div class="input-column">
-        <label>User ID:</label>
-        <input type="text" name="user_id" placeholder="Your Name or ID" required>
+        <div class="dashboard-grid">
+            <!-- Left Column: Inputs -->
+            <div class="input-column cyber-panel" style="animation-delay: 0.1s;">
+                <h3>Emission Sources</h3>
+                <form method="POST" id="emission-form" action="/index">
+                    <!-- Transport -->
+                    <div class="section" style="margin-bottom: 2rem;">
+                        <label class="tooltip">Transport Mode <span class="tooltiptext">Select your primary mode of travel today</span></label>
+                        <select name="transport_mode">
+                            <option value="public">Public Transport</option>
+                            <option value="car">Car (Gas)</option>
+                            <option value="ev">Electric Vehicle</option>
+                            <option value="bike">Bicycle/Walk</option>
+                        </select>
+                        <label>Distance Traveled (km)</label>
+                        <input type="number" name="distance" placeholder="e.g. 15.5" step="0.1" min="0">
+                    </div>
 
-        <label>Distance traveled (km):</label>
-        <input type="number" name="distance_km" step="0.001" min="0" required>
+                    <!-- Electricity -->
+                    <div class="section">
+                        <h4 style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.05em;">Daily Usage (Hours)</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label>AC</label>
+                                <input type="number" name="ac_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
+                            </div>
+                            <div>
+                                <label>Screen</label>
+                                <input type="number" name="screen_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
+                            </div>
+                            <div>
+                                <label>TV</label>
+                                <input type="number" name="tv_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
+                            </div>
+                            <div>
+                                <label>Lights</label>
+                                <input type="number" name="lighting_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
+                            </div>
+                        </div>
+                    </div>
+            </div>
 
-        <label>Transport mode:</label>
-        <select name="transport" required>
-            <option value="car">Car</option>
-            <option value="bike">Bike</option>
-            <option value="public">Public Transport</option>
-            <option value="ev">EV</option>
-        </select>
+            <!-- Center Column: Robot -->
+            <div class="mascot-column" style="animation-delay: 0.2s;">
+                <div id="robot-canvas"></div>
+                <div class="mascot-message" id="mascot-text">
+                    "System Online. Awaiting emission data for blockchain synchronization."
+                </div>
+                
+                <div style="margin-top: 24px; display: flex; gap: 12px; width: 100%;">
+                    <a href="/leaderboard" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;">🏆 Leaderboard</a>
+                    <a href="/wallet" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;">👛 Wallet</a>
+                </div>
+                
+                <button type="submit" form="emission-form" class="cyber-btn glitch-btn" style="width: 100%; margin-top: 12px; height: 56px; font-size: 1rem;">
+                    COMMIT TO BLOCKCHAIN
+                </button>
+            </div>
 
-        <label>Screen hours/day:</label>
-        <input type="number" name="screen_hours" min="0" max="24" step="0.1" required>
+            <!-- Right Column: Lifestyle & Renewables -->
+            <div class="input-column cyber-panel" style="animation-delay: 0.3s;">
+                <h3>Lifestyle & Energy</h3>
+                
+                <!-- Food & Water -->
+                <div class="section" style="margin-bottom: 2rem;">
+                    <label>Consumption</label>
+                    <input type="number" name="home_meals" placeholder="Home Cooked Meals" min="0">
+                    <input type="number" name="restaurant_meals" placeholder="Restaurant Meals" min="0">
+                    <input type="number" name="water_liters" placeholder="Processed Water (L)" min="0">
+                </div>
 
-        <label>AC hours/day:</label>
-        <input type="number" name="ac_hours" min="0" max="24" step="0.1" required>
+                <!-- Renewables -->
+                <div class="section">
+                    <label class="tooltip" style="margin-bottom: 1rem; display: block;">Renewable Generation <span class="tooltiptext">Electricity produced per day (units / kWh)</span></label>
+                    
+                    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="margin: 0;">Solar Power</label>
+                            <select name="has_solar" class="toggle-trigger" data-target="solar_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                        <input type="number" name="solar_kwh" id="solar_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="margin: 0;">Wind Power</label>
+                            <select name="has_wind" class="toggle-trigger" data-target="wind_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                        <input type="number" name="wind_kwh" id="wind_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="margin: 0;">Biogas</label>
+                            <select name="has_biogas" class="toggle-trigger" data-target="biogas_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                        <input type="number" name="biogas_kwh" id="biogas_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
     </div>
 
-    <!-- Hero Robot -->
-    <div id="hero-3d-container"></div>
-
-    <!-- Right column -->
-    <div class="input-column">
-        <label>Light usage hours/day:</label>
-        <input type="number" name="light_hours" min="0" max="24" step="0.1" required>
-
-        <label>TV hours/day:</label>
-        <input type="number" name="tv_hours" min="0" max="24" step="0.1" required>
-
-        <label>Home meals/day:</label>
-        <input type="number" name="home_meals" min="0" step="1" required>
-
-        <label>Restaurant meals/day:</label>
-        <input type="number" name="resto_meals" min="0" step="1" required>
-
-        <label>Processed water (liters/day):</label>
-        <input type="number" name="processed_water_liters" min="0" step="0.1" required>
-
-        <!-- Renewable options -->
-        <label>Solar energy?</label>
-        <select name="solar_used" id="solar_used">
-            <option value="no">No</option>
-            <option value="yes">Yes</option>
-        </select>
-        <div class="renewable-fields" id="solar_fields">
-            <label>Solar panel (kW):</label>
-            <input type="number" name="solar_kw" min="0" step="0.1" value="0">
-        </div>
-
-        <label>Wind energy?</label>
-        <select name="wind_used" id="wind_used">
-            <option value="no">No</option>
-            <option value="yes">Yes</option>
-        </select>
-        <div class="renewable-fields" id="wind_fields">
-            <label>Wind turbine (kW):</label>
-            <input type="number" name="wind_kw" min="0" step="0.1" value="0">
-        </div>
-
-        <label>Biogas?</label>
-        <select name="biogas_used" id="biogas_used">
-            <option value="no">No</option>
-            <option value="yes">Yes</option>
-        </select>
-        <div class="renewable-fields" id="biogas_fields">
-            <label>Biogas output (kWh/day):</label>
-            <input type="number" name="biogas_kwh" min="0" step="0.1" value="0">
-        </div>
-
-        <button type="submit">Calculate Carbon Footprint</button>
-    </div>
-</div>
-</form>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
-<script src="{{ url_for('static', filename='js/hero_robot.js') }}"></script>
-
-<script>
-// Show/hide renewable fields
-['solar','wind','biogas'].forEach(type=>{
-    const sel = document.getElementById(type+'_used');
-    const field = document.getElementById(type+'_fields');
-    sel.addEventListener('change',()=>{ field.style.display = sel.value==='yes'?'block':'none'; });
-});
-</script>
-<script>
-// Prevent entering >24 or <0 in hour inputs
-const hourFields = document.querySelectorAll('input[name="screen_hours"], input[name="ac_hours"], input[name="light_hours"], input[name="tv_hours"]');
-hourFields.forEach(field => {
-    field.addEventListener('input', () => {
-        if (field.value > 24) field.value = 24;
-        if (field.value < 0) field.value = 0;
-    });
-});
-</script>
-
+    <script src="/static/js/hero_robot.js"></script>
+    <script src="/static/js/dashboard.js"></script>
 </body>
 </html>
