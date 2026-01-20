@@ -125,5 +125,46 @@
         "nonce": 12,
         "readable_summary": "User tre earned 0.6 Green Credits for eco-friendly behavior.",
         "hash": "05ba2a49b87be7f35844df9434b73f7b7298a4e6026d77911d6eadaf8240369a"
+    },
+    {
+        "index": 7,
+        "timestamp": 1768649615.2641907,
+        "user_id": "tre",
+        "transaction_type": "emission",
+        "data": {
+            "inputs": {
+                "transport_mode": "public",
+                "has_solar": "no",
+                "has_wind": "no",
+                "has_biogas": "no"
+            },
+            "breakdown": {
+                "transport": 0.0,
+                "electricity": 0.0,
+                "food_water": 0.0
+            },
+            "gross": 0.0,
+            "offset": 0.0,
+            "net": 0,
+            "score": 100
+        },
+        "previous_hash": "87e9cc75b267321bcf151ccff36bec3094def627d56e127829fdd67d0f50131d",
+        "nonce": 7,
+        "readable_summary": "User tre logged activity. Net: 0kg CO2. Offset: 0.0kg. Score: 100/100.",
+        "hash": "024cf95a8b71cce7c452c6ebce2c2a6fe1c24ef373f25d936bf16ea694ffaae6"
+    },
+    {
+        "index": 8,
+        "timestamp": 1768649615.2648304,
+        "user_id": "tre",
+        "transaction_type": "reward",
+        "data": {
+            "credits": 25.0,
+            "reason": "Eco-Score Reward"
+        },
+        "previous_hash": "62e6d65542aa8b16b9ecb382a98f0b54e26501eb0efbc0b162c8da04f9604712",
+        "nonce": 75,
+        "readable_summary": "User tre earned 25.0 Green Credits for eco-friendly behavior.",
+        "hash": "0b3d8b91692b874afb6326e450cba85d62242258b96a9bef56e62a9b420e69d3"
     }
 ]

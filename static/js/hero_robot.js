@@ -27,16 +27,23 @@ scene.add(robot);
 
 // Materials
 const metalMat = new THREE.MeshStandardMaterial({ 
-    color: 0xffffff, // Pure White
-    roughness: 0.2, 
-    metalness: 0.5 // Reduced metalness for brighter look
+    color: 0x10b981, // Pure White
+    roughness: 0.35, 
+    metalness: 0.6 // Reduced metalness for brighter look
 });
-const glowMat = new THREE.MeshBasicMaterial({ color: 0x10b981 }); // Emerald
-const eyeMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 }); // Cyan
+const glowMat = new THREE.MeshBasicMaterial({ 
+    color: 0x34f5c5    // Neon mint glow
+});
+
+const eyeMat = new THREE.MeshBasicMaterial({ 
+    color: 0x9fffe0    // Soft glowing eyes
+});
 
 // Head
-const headGeo = new THREE.BoxGeometry(1.2, 1, 1);
+const headGeo = new THREE.BoxGeometry(1.2, 1, 1, 6, 6, 6);
 const head = new THREE.Mesh(headGeo, metalMat);
+head.geometry.computeVertexNormals();
+
 robot.add(head);
 
 // Eyes
@@ -84,7 +91,8 @@ document.addEventListener('mousemove', (event) => {
     // Normalize mouse position relative to canvas center
     const rect = container.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const y = ((event.clientY - rect.top) / rect.height) * 2 - 1;
+
     
     mouse.set(x, y);
 });
@@ -100,7 +108,8 @@ function animate() {
     body.scale.z = 1 + Math.sin(time) * 0.02;
 
     // Head Tracking (Smooth Lerp)
-    targetRotation.x = mouse.y * 0.5;
+    targetRotation.x = -mouse.y * 0.5;
+
     targetRotation.y = mouse.x * 0.5;
 
     head.rotation.x += (targetRotation.x - head.rotation.x) * 0.1;
