@@ -166,5 +166,19 @@
         "nonce": 75,
         "readable_summary": "User tre earned 25.0 Green Credits for eco-friendly behavior.",
         "hash": "0b3d8b91692b874afb6326e450cba85d62242258b96a9bef56e62a9b420e69d3"
+    },
+    {
+        "index": 9,
+        "timestamp": 1769013557.376648,
+        "user_id": "ret",
+        "transaction_type": "reward",
+        "data": {
+            "credits": 10,
+            "reason": "Welcome Bonus"
+        },
+        "previous_hash": "f1f79c9755cba51b78f258cf3aef378e57ccf10c9eb86858c8ce5763377375e3",
+        "nonce": 1,
+        "readable_summary": "User ret earned 10 Green Credits for eco-friendly behavior.",
+        "hash": "09b4bea4a5a23b0b6fdee8749d54242f0ed93517b7d90d2422068c8ef9bb6dd1"
     }
 ]
