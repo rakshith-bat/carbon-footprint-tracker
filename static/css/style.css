@@ -401,3 +401,12 @@ tr:hover td {
 ::-webkit-scrollbar-thumb:hover {
     background: #fff;
 }
+/* Robot canvas container */
+#robot-canvas {
+    width: 380px;
+    height: 480px;
+    position: relative;
+}
+canvas {
+    display: block;
+}

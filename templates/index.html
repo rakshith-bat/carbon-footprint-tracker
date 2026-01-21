@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CarbonChain | Tracker</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 </head>
 <body>
     <nav class="nav-bar">
@@ -143,8 +143,18 @@
         </form>
     </div>
 
-    <script src="/static/js/hero_robot.js"></script>
-    <script src="/static/js/dashboard.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.module.js",
+    "three/": "https://cdn.jsdelivr.net/npm/three@0.154.0/"
+  }
+}
+</script>
+<script type="module" src="/static/js/hero_robotv2.js"></script>
+<!-- 3️⃣ Other scripts -->
+<script src="/static/js/dashboard.js"></script>
+
 </body>
 </html>
 git 
