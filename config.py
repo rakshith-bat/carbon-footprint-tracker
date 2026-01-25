@@ -6,3 +6,7 @@ class Config:
     BLOCKCHAIN_FILE = os.path.join(DATA_DIR, 'blockchain.json')
     USERS_FILE = os.path.join(DATA_DIR, 'users.json')
     TRANSACTIONS_FILE = os.path.join(DATA_DIR, 'transactions.json')
+
+# Blockchain Settings
+DIFFICULTY = 2
+MINING_REWARD = 25.0

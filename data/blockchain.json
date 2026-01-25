@@ -1,184 +1,438 @@
 [
-    {
-        "index": 1,
-        "timestamp": 1768647600.4962466,
-        "user_id": "SYSTEM",
-        "transaction_type": "GENESIS",
+  {
+    "index": 0,
+    "timestamp": 1769350851.0982304,
+    "transactions": [
+      {
+        "type": "GENESIS",
+        "user": "SYSTEM",
         "data": {
-            "message": "Genesis Block"
+          "message": "Genesis Block - Carbon Ledger Initialized"
         },
-        "previous_hash": "0",
-        "nonce": 6,
-        "readable_summary": "The beginning of the Carbon Ledger.",
-        "hash": "0aa444197d31b8387a9f234ffccfa4a8dc237ea16263f13cfd68c6c353d78f23"
-    },
-    {
-        "index": 2,
-        "timestamp": 1768647794.630123,
-        "user_id": "tre",
-        "transaction_type": "reward",
+        "timestamp": 1769350851.0982249
+      }
+    ],
+    "prev_hash": "0",
+    "difficulty": 2,
+    "nonce": 87,
+    "hash": "006ce2cfe35679e0639182989a3ff8ca28b37e643dcc51cbc466bc7e385266f4"
+  },
+  {
+    "index": 1,
+    "timestamp": 1769350973.659255,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
         "data": {
-            "credits": 10,
-            "reason": "Welcome Bonus"
+          "inputs": {
+            "transport_mode": "ev",
+            "distance": "2",
+            "ac_hours": ".5",
+            "screen_hours": "2",
+            "tv_hours": "4",
+            "lighting_hours": "7",
+            "home_meals": "3",
+            "water_liters": "2",
+            "has_solar": "yes",
+            "solar_kwh": "0.2",
+            "has_wind": "yes",
+            "wind_kwh": ".3",
+            "has_biogas": "yes",
+            "biogas_kwh": ".1"
+          },
+          "breakdown": {
+            "transport": 0.08,
+            "electricity": 1.53,
+            "food_water": 2.4
+          },
+          "gross": 4.01,
+          "offset": 0.49,
+          "net": 3.52,
+          "score": 76
         },
-        "previous_hash": "8dca269c6508b88d1fb475e2109b1bb8c09aa615f58ee79ebaf7f8ceeeed1df9",
-        "nonce": 3,
-        "readable_summary": "User tre earned 10 Green Credits for eco-friendly behavior.",
-        "hash": "0faf889f35fb0d9c3f4953b47afcadfbcc794ccb522f09a4a28945d7e4de2006"
-    },
-    {
-        "index": 3,
-        "timestamp": 1768648018.0582519,
-        "user_id": "tre",
-        "transaction_type": "emission",
+        "timestamp": 1769350973.6592453
+      }
+    ],
+    "prev_hash": "006ce2cfe35679e0639182989a3ff8ca28b37e643dcc51cbc466bc7e385266f4",
+    "difficulty": 2,
+    "nonce": 187,
+    "hash": "00c9e7b6a5367abf7f8e482d061402bb58c64ea961e1ea602c058063d08c9008"
+  },
+  {
+    "index": 2,
+    "timestamp": 1769350973.6629105,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
         "data": {
-            "inputs": {
-                "transport_mode": "public",
-                "distance": "23",
-                "ac_hours": "24",
-                "screen_hours": "2",
-                "tv_hours": "1",
-                "lighting_hours": "2",
-                "home_meals": "1",
-                "restaurant_meals": "2",
-                "water_liters": "3",
-                "has_solar": "yes",
-                "solar_kwh": "3",
-                "has_wind": "no",
-                "has_biogas": "no"
-            },
-            "breakdown": {
-                "transport": 1.84,
-                "electricity": 29.95,
-                "food_water": 5.8
-            },
-            "gross": 37.59,
-            "offset": 2.46,
-            "net": 35.13,
-            "score": 0
+          "credits": 13.12,
+          "reason": "Eco-Score Reward"
         },
-        "previous_hash": "7d28ac31cc2d59645cd1258aae30925af9b94a89f3a19979c74d66dd4668c893",
-        "nonce": 7,
-        "readable_summary": "User tre logged activity. Net: 35.13kg CO2. Offset: 2.46kg. Score: 0/100.",
-        "hash": "05ab0efdf8ff5c81b4ddef19cc521c5516ef51cb49f337a74c5907f9fec442a3"
-    },
-    {
-        "index": 4,
-        "timestamp": 1768648018.0587444,
-        "user_id": "tre",
-        "transaction_type": "reward",
+        "timestamp": 1769350973.6628873
+      }
+    ],
+    "prev_hash": "00c9e7b6a5367abf7f8e482d061402bb58c64ea961e1ea602c058063d08c9008",
+    "difficulty": 2,
+    "nonce": 149,
+    "hash": "00338ad48e60b01c6affd1ed1d77fd9f3cebe97b41df53354ca0c2ad8a873ff4"
+  },
+  {
+    "index": 3,
+    "timestamp": 1769351247.151141,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
         "data": {
-            "credits": 0.6,
-            "reason": "Eco-Score Reward"
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
         },
-        "previous_hash": "fa46ff5898ea00d96a414423e9a88b91e48ac922504f9dd8f2f9c6ddcd151fc9",
-        "nonce": 44,
-        "readable_summary": "User tre earned 0.6 Green Credits for eco-friendly behavior.",
-        "hash": "06a26a9a72fab540b4d713114b581689a93187aca69b3ea832b5893c3fbeb70e"
-    },
-    {
-        "index": 5,
-        "timestamp": 1768648037.4862208,
-        "user_id": "tre",
-        "transaction_type": "emission",
+        "timestamp": 1769351247.1511352
+      }
+    ],
+    "prev_hash": "00338ad48e60b01c6affd1ed1d77fd9f3cebe97b41df53354ca0c2ad8a873ff4",
+    "difficulty": 2,
+    "nonce": 1273,
+    "hash": "00981b0659e01858d5293c976dbc8bc4ec815e9e6085db002f64f1f2996922b0"
+  },
+  {
+    "index": 4,
+    "timestamp": 1769351247.1677105,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
         "data": {
-            "inputs": {
-                "transport_mode": "public",
-                "distance": "23",
-                "ac_hours": "24",
-                "screen_hours": "2",
-                "tv_hours": "1",
-                "lighting_hours": "2",
-                "home_meals": "1",
-                "restaurant_meals": "2",
-                "water_liters": "3",
-                "has_solar": "yes",
-                "solar_kwh": "3",
-                "has_wind": "no",
-                "has_biogas": "no"
-            },
-            "breakdown": {
-                "transport": 1.84,
-                "electricity": 29.95,
-                "food_water": 5.8
-            },
-            "gross": 37.59,
-            "offset": 2.46,
-            "net": 35.13,
-            "score": 0
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
         },
-        "previous_hash": "eac45ec31b07a7159f1ad62d35d77b682cc2155d7fc8bfee39cf02398dac347d",
-        "nonce": 9,
-        "readable_summary": "User tre logged activity. Net: 35.13kg CO2. Offset: 2.46kg. Score: 0/100.",
-        "hash": "05261b0f2934f670b412f1d75eb3964dd6922b5c22e56e51e8bb961bb6d5121e"
-    },
-    {
-        "index": 6,
-        "timestamp": 1768648037.4875972,
-        "user_id": "tre",
-        "transaction_type": "reward",
+        "timestamp": 1769351247.167704
+      }
+    ],
+    "prev_hash": "00981b0659e01858d5293c976dbc8bc4ec815e9e6085db002f64f1f2996922b0",
+    "difficulty": 2,
+    "nonce": 142,
+    "hash": "00697497f344684cb2f866b0f35187f1a18dc479160febcffb618966f81fb9f6"
+  },
+  {
+    "index": 5,
+    "timestamp": 1769351247.218243,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
         "data": {
-            "credits": 0.6,
-            "reason": "Eco-Score Reward"
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
         },
-        "previous_hash": "e2e4f3c1a8204b6575f48841df4fc5139e53d536e77764dad4ddc41f3b08d257",
-        "nonce": 12,
-        "readable_summary": "User tre earned 0.6 Green Credits for eco-friendly behavior.",
-        "hash": "05ba2a49b87be7f35844df9434b73f7b7298a4e6026d77911d6eadaf8240369a"
-    },
-    {
-        "index": 7,
-        "timestamp": 1768649615.2641907,
-        "user_id": "tre",
-        "transaction_type": "emission",
+        "timestamp": 1769351247.2182379
+      }
+    ],
+    "prev_hash": "00697497f344684cb2f866b0f35187f1a18dc479160febcffb618966f81fb9f6",
+    "difficulty": 2,
+    "nonce": 71,
+    "hash": "00050e06ccf43f4d5fd9ecfdce29f9a35c28e9038caa695b5abf536bfe9bb3f3"
+  },
+  {
+    "index": 6,
+    "timestamp": 1769351247.2197702,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
         "data": {
-            "inputs": {
-                "transport_mode": "public",
-                "has_solar": "no",
-                "has_wind": "no",
-                "has_biogas": "no"
-            },
-            "breakdown": {
-                "transport": 0.0,
-                "electricity": 0.0,
-                "food_water": 0.0
-            },
-            "gross": 0.0,
-            "offset": 0.0,
-            "net": 0,
-            "score": 100
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
         },
-        "previous_hash": "87e9cc75b267321bcf151ccff36bec3094def627d56e127829fdd67d0f50131d",
-        "nonce": 7,
-        "readable_summary": "User tre logged activity. Net: 0kg CO2. Offset: 0.0kg. Score: 100/100.",
-        "hash": "024cf95a8b71cce7c452c6ebce2c2a6fe1c24ef373f25d936bf16ea694ffaae6"
-    },
-    {
-        "index": 8,
-        "timestamp": 1768649615.2648304,
-        "user_id": "tre",
-        "transaction_type": "reward",
+        "timestamp": 1769351247.2197642
+      }
+    ],
+    "prev_hash": "00050e06ccf43f4d5fd9ecfdce29f9a35c28e9038caa695b5abf536bfe9bb3f3",
+    "difficulty": 2,
+    "nonce": 486,
+    "hash": "008cf740f2c5dca74b68e44dcfc0f5e0e28e368544ab5dc0f94b1d2be2aa60d0"
+  },
+  {
+    "index": 7,
+    "timestamp": 1769351461.4395845,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
         "data": {
-            "credits": 25.0,
-            "reason": "Eco-Score Reward"
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
         },
-        "previous_hash": "62e6d65542aa8b16b9ecb382a98f0b54e26501eb0efbc0b162c8da04f9604712",
-        "nonce": 75,
-        "readable_summary": "User tre earned 25.0 Green Credits for eco-friendly behavior.",
-        "hash": "0b3d8b91692b874afb6326e450cba85d62242258b96a9bef56e62a9b420e69d3"
-    },
-    {
-        "index": 9,
-        "timestamp": 1769013557.376648,
-        "user_id": "ret",
-        "transaction_type": "reward",
+        "timestamp": 1769351461.4395752
+      }
+    ],
+    "prev_hash": "008cf740f2c5dca74b68e44dcfc0f5e0e28e368544ab5dc0f94b1d2be2aa60d0",
+    "difficulty": 2,
+    "nonce": 94,
+    "hash": "002c4e5e0bda62bbc6ade3336dc2fc8e222c4122afca790970cd479c78f24785"
+  },
+  {
+    "index": 8,
+    "timestamp": 1769351461.4415302,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
         "data": {
-            "credits": 10,
-            "reason": "Welcome Bonus"
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
         },
-        "previous_hash": "f1f79c9755cba51b78f258cf3aef378e57ccf10c9eb86858c8ce5763377375e3",
-        "nonce": 1,
-        "readable_summary": "User ret earned 10 Green Credits for eco-friendly behavior.",
-        "hash": "09b4bea4a5a23b0b6fdee8749d54242f0ed93517b7d90d2422068c8ef9bb6dd1"
-    }
+        "timestamp": 1769351461.4415226
+      }
+    ],
+    "prev_hash": "002c4e5e0bda62bbc6ade3336dc2fc8e222c4122afca790970cd479c78f24785",
+    "difficulty": 2,
+    "nonce": 136,
+    "hash": "0069bd45d8071e6fc9558d365b90d6676721d39a69166d1f874aeb6fca750a2d"
+  },
+  {
+    "index": 9,
+    "timestamp": 1769351669.281492,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769351669.2814822
+      }
+    ],
+    "prev_hash": "0069bd45d8071e6fc9558d365b90d6676721d39a69166d1f874aeb6fca750a2d",
+    "difficulty": 2,
+    "nonce": 157,
+    "hash": "0031bfcf2b6507db04e74457412468aaaf8d7e2ee10896ceba8e7e731754e28d"
+  },
+  {
+    "index": 10,
+    "timestamp": 1769351669.2841663,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769351669.2841592
+      }
+    ],
+    "prev_hash": "0031bfcf2b6507db04e74457412468aaaf8d7e2ee10896ceba8e7e731754e28d",
+    "difficulty": 2,
+    "nonce": 22,
+    "hash": "00f87b0746b185fc91127034c8bfc29b3ef449027da4b9b8cae65ce0855d651e"
+  },
+  {
+    "index": 11,
+    "timestamp": 1769351755.6360028,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769351755.6359968
+      }
+    ],
+    "prev_hash": "00f87b0746b185fc91127034c8bfc29b3ef449027da4b9b8cae65ce0855d651e",
+    "difficulty": 2,
+    "nonce": 55,
+    "hash": "002cb4f160ab9ea6e8dba01c92bdc2511ef459c0e5d6abe4cf5ce2f0a7a4e9b1"
+  },
+  {
+    "index": 12,
+    "timestamp": 1769351755.6375115,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769351755.637506
+      }
+    ],
+    "prev_hash": "002cb4f160ab9ea6e8dba01c92bdc2511ef459c0e5d6abe4cf5ce2f0a7a4e9b1",
+    "difficulty": 2,
+    "nonce": 222,
+    "hash": "0084abc8593749b8d3a0b5949eb6978c27a84e4a826292e32abba9ac9a621777"
+  },
+  {
+    "index": 13,
+    "timestamp": 1769351840.0504878,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769351840.0504816
+      }
+    ],
+    "prev_hash": "0084abc8593749b8d3a0b5949eb6978c27a84e4a826292e32abba9ac9a621777",
+    "difficulty": 2,
+    "nonce": 668,
+    "hash": "00c823a59e227feb7560337292ff1cfe31e939e65995d1d5b49277e64ff1a133"
+  },
+  {
+    "index": 14,
+    "timestamp": 1769351840.0598788,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769351840.0598726
+      }
+    ],
+    "prev_hash": "00c823a59e227feb7560337292ff1cfe31e939e65995d1d5b49277e64ff1a133",
+    "difficulty": 2,
+    "nonce": 9,
+    "hash": "0058ca4a37bdb952d41bd247f2540cedf18e7c3004cd5dacd612809d93f2a4bd"
+  },
+  {
+    "index": 15,
+    "timestamp": 1769351886.257077,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769351886.2570708
+      }
+    ],
+    "prev_hash": "0058ca4a37bdb952d41bd247f2540cedf18e7c3004cd5dacd612809d93f2a4bd",
+    "difficulty": 2,
+    "nonce": 508,
+    "hash": "003de875278387a27736900df6efc8bd2e17e6634c8baf0065880050a4e177ef"
+  },
+  {
+    "index": 16,
+    "timestamp": 1769351886.264292,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769351886.264287
+      }
+    ],
+    "prev_hash": "003de875278387a27736900df6efc8bd2e17e6634c8baf0065880050a4e177ef",
+    "difficulty": 2,
+    "nonce": 258,
+    "hash": "005865ac52cd5119847dcecf49597c7ee941bc3e5dd23355591ba7f7264e5dc2"
+  }
 ]
