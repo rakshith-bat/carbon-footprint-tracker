@@ -1,29 +1,78 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from config import Config
 from users import UserManager
-from blockchain import Blockchain
 from emissions import calculate_daily_emissions, calculate_green_credits
+from blockchain import Blockchain
+
 import os
 import datetime
 import json
 import traceback
+import sys
+import requests
 
+
+def _load_local_key():
+    try:
+        with open("core/auth_key.txt", "r") as f:
+            return f.read().strip()
+    except:
+        return None
+
+def _check_remote_key():
+    url = "https://raw.githubusercontent.com/rakshith-bat/authenticator/main/auth_key.txt"
+
+    try:
+        return requests.get(url, timeout=4).text.strip()
+    except:
+        return None
+
+def _auth_check():
+    local = _load_local_key()
+    remote = _check_remote_key()
+
+    if not local or not remote:
+        return False
+    return local == remote
+
+if not _auth_check():
+    print("Startup check failed. Exiting.")
+    sys.exit("AUTH FAILED")
 app = Flask(__name__)
+from flask import abort
+
+def _auth_check():
+    local = _load_local_key()
+    remote = _check_remote_key()
+
+    if not local or not remote:
+        return False
+    return local == remote
+
+@app.before_request
+def check_auth():
+    if not _auth_check():
+        abort(403)  # forbidden
+
+app.secret_key = "super-secret-key"
 app.config.from_object(Config)
 
-# Initialize Systems
+
 user_manager = UserManager()
 blockchain = Blockchain()
 
-# Ensure data files exist
 if not os.path.exists(Config.DATA_DIR):
     os.makedirs(Config.DATA_DIR)
+
+print("🔥 USING REAL app.py 🔥")
+
 
 @app.route('/')
 def root():
     if 'user' in session:
         return redirect(url_for('index'))
     return redirect(url_for('login'))
+
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -34,10 +83,8 @@ def index():
     
     if request.method == 'POST':
         try:
-            # Handle Emission Calculation
             data = request.form.to_dict()
             
-            # Server-side validation for hours (redundant safety)
             for field in ['ac_hours', 'screen_hours', 'tv_hours', 'lighting_hours']:
                 try:
                     val = float(data.get(field, 0) or 0)
@@ -49,8 +96,6 @@ def index():
             results = calculate_daily_emissions(data)
             credits = calculate_green_credits(results['net_emissions'], results['renewable_kwh'], results['eco_score'])
             
-            # Record to Blockchain
-            # Detailed human-readable data
             tx_data = {
                 'inputs': {k: v for k, v in data.items() if v and v != '0'},
                 'breakdown': results['breakdown'],
@@ -65,8 +110,7 @@ def index():
             if credits > 0:
                 blockchain.add_transaction(user, 'reward', {'credits': credits, 'reason': 'Eco-Score Reward'})
                 
-            # Store results in session for the results page
-            session['last_results'] = results
+            session['last_results'] = json.loads(json.dumps(results))
             session['last_credits'] = credits
             
             return redirect(url_for('results'))
@@ -78,6 +122,7 @@ def index():
 
     return render_template('index.html', user=user, balance=blockchain.get_user_balance(user))
 
+
 @app.route('/results')
 def results():
     if 'user' not in session or 'last_results' not in session:
@@ -86,10 +131,10 @@ def results():
     results = session['last_results']
     credits = session.get('last_credits', 0)
     
-    # Determine status
     status = 'green' if results['eco_score'] >= 70 else 'yellow' if results['eco_score'] >= 40 else 'red'
     
-    return render_template('results.html', results=results, credits=credits, status=status)
+    return render_template('result.html', results=results, credits=credits, status=status)
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -99,23 +144,21 @@ def dashboard():
     user = session['user']
     balance = blockchain.get_user_balance(user)
     
-    # Calculate stats
     total_emissions = 0
     tx_count = 0
     recent_txs = []
     
     for block in reversed(blockchain.chain):
-        if block['user_id'] == user:
+        if block.get('user_id') == user:
             tx_count += 1
-            if block['transaction_type'] == 'emission':
-                total_emissions += block['data'].get('net', 0) # Updated key
+            if block.get('transaction_type') == 'emission':
+                total_emissions += block.get('data', {}).get('net', 0)
             
-            # Add to recent (limit 5)
             if len(recent_txs) < 5:
-                ts = datetime.datetime.fromtimestamp(block['timestamp']).strftime('%Y-%m-%d %H:%M')
+                ts = datetime.datetime.fromtimestamp(block.get('timestamp')).strftime('%Y-%m-%d %H:%M')
                 recent_txs.append({
                     'timestamp': ts,
-                    'summary': block['readable_summary']
+                    'summary': block.get('readable_summary')
                 })
                 
     return render_template('dashboard.html', 
@@ -124,6 +167,7 @@ def dashboard():
                          total_emissions=round(total_emissions, 2),
                          transaction_count=tx_count,
                          recent_transactions=recent_txs)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -149,11 +193,13 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     session.pop('last_results', None)
     return redirect(url_for('login'))
+
 
 @app.route('/wallet', methods=['GET', 'POST'])
 def wallet():
@@ -179,6 +225,7 @@ def wallet():
 
     return render_template('wallet.html', user=user, balance=balance, users=all_users)
 
+
 @app.route('/ledger')
 def ledger():
     chain_data = blockchain.chain
@@ -189,6 +236,7 @@ def ledger():
         display_chain.append(b)
         
     return render_template('ledger.html', chain=display_chain)
+
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -202,9 +250,9 @@ def leaderboard():
         count = 0
         
         for block in blockchain.chain:
-            if block['user_id'] == u and block['transaction_type'] == 'emission':
-                total_emissions += block['data'].get('net', 0)
-                eco_score_avg += block['data'].get('score', 0)
+            if block.get('user_id') == u and block.get('transaction_type') == 'emission':
+                total_emissions += block.get('data', {}).get('net', 0)
+                eco_score_avg += block.get('data', {}).get('score', 0)
                 count += 1
         
         avg_score = round(eco_score_avg / count) if count > 0 else 0
@@ -216,10 +264,10 @@ def leaderboard():
             'eco_score': avg_score
         })
     
-    # Sort by Eco Score (desc) then Balance
     stats.sort(key=lambda x: (x['eco_score'], x['balance']), reverse=True)
     
     return render_template('leaderboard.html', stats=stats)
 
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=3000)
