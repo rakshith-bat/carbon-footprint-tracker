@@ -144,21 +144,25 @@ def dashboard():
     user = session['user']
     balance = blockchain.get_user_balance(user)
     
+    # Calculate stats - Convert blocks to dicts first
     total_emissions = 0
     tx_count = 0
     recent_txs = []
     
     for block in reversed(blockchain.chain):
-        if block.get('user_id') == user:
+        block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
+        
+        if block_dict.get('user_id') == user:
             tx_count += 1
-            if block.get('transaction_type') == 'emission':
-                total_emissions += block.get('data', {}).get('net', 0)
+            if block_dict.get('transaction_type') == 'emission':
+                total_emissions += block_dict.get('data', {}).get('net', 0)
             
+            # Add to recent (limit 5)
             if len(recent_txs) < 5:
-                ts = datetime.datetime.fromtimestamp(block.get('timestamp')).strftime('%Y-%m-%d %H:%M')
+                ts = datetime.datetime.fromtimestamp(block_dict['timestamp']).strftime('%Y-%m-%d %H:%M')
                 recent_txs.append({
                     'timestamp': ts,
-                    'summary': block.get('readable_summary')
+                    'summary': block_dict.get('readable_summary', 'Transaction')
                 })
                 
     return render_template('dashboard.html', 
@@ -167,7 +171,6 @@ def dashboard():
                          total_emissions=round(total_emissions, 2),
                          transaction_count=tx_count,
                          recent_transactions=recent_txs)
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -228,11 +231,11 @@ def wallet():
 
 @app.route('/ledger')
 def ledger():
-    chain_data = blockchain.chain
+    chain_data = [block.to_dict() for block in blockchain.chain]  # Convert to dicts first
     display_chain = []
-    for block in chain_data:
-        b = block.copy()
-        b['timestamp'] = datetime.datetime.fromtimestamp(block['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
+    for block_dict in chain_data:
+        b = block_dict.copy()
+        b['timestamp'] = datetime.datetime.fromtimestamp(block_dict['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
         display_chain.append(b)
         
     return render_template('ledger.html', chain=display_chain)
@@ -250,9 +253,11 @@ def leaderboard():
         count = 0
         
         for block in blockchain.chain:
-            if block.get('user_id') == u and block.get('transaction_type') == 'emission':
-                total_emissions += block.get('data', {}).get('net', 0)
-                eco_score_avg += block.get('data', {}).get('score', 0)
+            block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
+            
+            if block_dict.get('user_id') == u and block_dict.get('transaction_type') == 'emission':
+                total_emissions += block_dict.get('data', {}).get('net', 0)
+                eco_score_avg += block_dict.get('data', {}).get('score', 0)
                 count += 1
         
         avg_score = round(eco_score_avg / count) if count > 0 else 0
@@ -264,10 +269,25 @@ def leaderboard():
             'eco_score': avg_score
         })
     
+    # Sort by Eco Score (desc) then Balance
     stats.sort(key=lambda x: (x['eco_score'], x['balance']), reverse=True)
     
     return render_template('leaderboard.html', stats=stats)
 
-
 if __name__ == '__main__':
-    app.run(debug=True, port=3000)
+    from threading import Thread
+    from werkzeug.serving import make_server
+
+    def run_server(port):
+        server = make_server('0.0.0.0', port, app)
+        server.serve_forever()
+
+    Thread(target=run_server, args=(3000,), daemon=True).start()
+    Thread(target=run_server, args=(5000,), daemon=True).start()
+
+    print("🚀 App running on ports 3000 and 5000")
+
+    # keep main thread alive
+    import time
+    while True:
+        time.sleep(1)
