@@ -26,6 +26,10 @@ class GlobalState:
     # ----------------------------------
     def apply_block(self, block):
         for tx in block.transactions:
+            # normalize tx to dict if it's a Transaction object
+            if hasattr(tx, "to_dict"):
+                tx = tx.to_dict()
+
             tx_type = tx.get("type")
             user = tx.get("user")
             data = tx.get("data", {})
@@ -69,7 +73,7 @@ class GlobalState:
                 pass
 
     # ----------------------------------
-    # 🔥 THIS WAS THE MISSING PIECE
+    #  Rebuild state from chain
     # ----------------------------------
     def rebuild_from_chain(self, chain):
         self.accounts = {}

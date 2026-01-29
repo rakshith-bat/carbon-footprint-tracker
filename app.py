@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort
 from config import Config
 from users import UserManager
 from emissions import calculate_daily_emissions, calculate_green_credits
@@ -10,8 +10,11 @@ import json
 import traceback
 import sys
 import requests
+import time
+from threading import Thread
+from werkzeug.serving import make_server
 
-
+# --- Auth Utilities ---
 def _load_local_key():
     try:
         with open("core/auth_key.txt", "r") as f:
@@ -21,7 +24,6 @@ def _load_local_key():
 
 def _check_remote_key():
     url = "https://raw.githubusercontent.com/rakshith-bat/authenticator/main/auth_key.txt"
-
     try:
         return requests.get(url, timeout=4).text.strip()
     except:
@@ -30,7 +32,6 @@ def _check_remote_key():
 def _auth_check():
     local = _load_local_key()
     remote = _check_remote_key()
-
     if not local or not remote:
         return False
     return local == remote
@@ -38,26 +39,18 @@ def _auth_check():
 if not _auth_check():
     print("Startup check failed. Exiting.")
     sys.exit("AUTH FAILED")
+
+# --- Flask Setup ---
 app = Flask(__name__)
-from flask import abort
-
-def _auth_check():
-    local = _load_local_key()
-    remote = _check_remote_key()
-
-    if not local or not remote:
-        return False
-    return local == remote
-
-@app.before_request
-def check_auth():
-    if not _auth_check():
-        abort(403)  # forbidden
-
 app.secret_key = "super-secret-key"
 app.config.from_object(Config)
 
+@app.before_request
+def check_auth_before_request():
+    if not _auth_check():
+        abort(403)
 
+# --- Core Instances ---
 user_manager = UserManager()
 blockchain = Blockchain()
 
@@ -66,13 +59,10 @@ if not os.path.exists(Config.DATA_DIR):
 
 print(" USING REAL blockchain INSTANCE ")
 
-
+# --- Routes ---
 @app.route('/')
 def root():
-    if 'user' in session:
-        return redirect(url_for('index'))
-    return redirect(url_for('login'))
-
+    return redirect(url_for('index')) if 'user' in session else redirect(url_for('login'))
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -80,21 +70,17 @@ def index():
         return redirect(url_for('login'))
     
     user = session['user']
-    
     if request.method == 'POST':
         try:
             data = request.form.to_dict()
-            
+            # Validate hours
             for field in ['ac_hours', 'screen_hours', 'tv_hours', 'lighting_hours']:
-                try:
-                    val = float(data.get(field, 0) or 0)
-                    if val < 0 or val > 24:
-                        return render_template('index.html', user=user, error=f"Invalid input: {field} must be 0-24 hours")
-                except ValueError:
-                    pass
-
+                val = float(data.get(field, 0) or 0)
+                if val < 0 or val > 24:
+                    return render_template('index.html', user=user, error=f"{field} must be 0-24")
+            
             results = calculate_daily_emissions(data)
-            # normalize naming for templates
+            # normalize net key for template
             results['net'] = results['net_emissions']
 
             credits = calculate_green_credits(results['net_emissions'], results['renewable_kwh'], results['eco_score'])
@@ -108,8 +94,10 @@ def index():
                 'score': results['eco_score']
             }
             
+            # Add emission tx
             blockchain.add_transaction(user, 'emission', tx_data)
             
+            # Add credits tx
             if credits > 0:
                 blockchain.add_transaction(user, 'reward', {'credits': credits, 'reason': 'Eco-Score Reward'})
                 
@@ -117,63 +105,51 @@ def index():
             session['last_credits'] = credits
             
             return redirect(url_for('results'))
-            
         except Exception as e:
             print(f"Error processing submission: {e}")
             traceback.print_exc()
-            return render_template('index.html', user=user, error="An error occurred while processing your data. Please check your inputs.")
-
+            return render_template('index.html', user=user, error="Error processing data.")
+    
     return render_template('index.html', user=user, balance=blockchain.get_user_balance(user))
-
 
 @app.route('/results')
 def results():
     if 'user' not in session or 'last_results' not in session:
         return redirect(url_for('index'))
-    
     results = session['last_results']
     credits = session.get('last_credits', 0)
-    
     status = 'green' if results['eco_score'] >= 70 else 'yellow' if results['eco_score'] >= 40 else 'red'
-    
     return render_template('result.html', results=results, credits=credits, status=status)
-
 
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
-    
     user = session['user']
     balance = blockchain.get_user_balance(user)
     
-    # Calculate stats - Convert blocks to dicts first
     total_emissions = 0
     tx_count = 0
     recent_txs = []
     
     for block in reversed(blockchain.chain):
         block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
-        
-        if block_dict.get('user_id') == user:
-            tx_count += 1
-            if block_dict.get('transaction_type') == 'emission':
-                total_emissions += block_dict.get('data', {}).get('net', 0)
-            
-            # Add to recent (limit 5)
-            if len(recent_txs) < 5:
-                ts = datetime.datetime.fromtimestamp(block_dict['timestamp']).strftime('%Y-%m-%d %H:%M')
-                recent_txs.append({
-                    'timestamp': ts,
-                    'summary': block_dict.get('readable_summary', 'Transaction')
-                })
-                
-    return render_template('dashboard.html', 
-                         user=user, 
-                         balance=balance, 
-                         total_emissions=round(total_emissions, 2),
-                         transaction_count=tx_count,
-                         recent_transactions=recent_txs)
+        for tx in block_dict.get("user_transactions", []):
+            if tx["user_id"] == user:
+                tx_count += 1
+                if tx["transaction_type"] == "carbon_emission":
+                    total_emissions += tx["data"].get("net", 0)
+
+                if len(recent_txs) < 5:
+                    ts = datetime.datetime.fromtimestamp(block_dict['timestamp']).strftime('%Y-%m-%d %H:%M')
+                    recent_txs.append({'timestamp': ts, 'summary': block_dict.get('readable_summary', 'Transaction')})
+    
+    return render_template('dashboard.html',
+                           user=user,
+                           balance=balance,
+                           total_emissions=round(total_emissions, 2),
+                           transaction_count=tx_count,
+                           recent_transactions=recent_txs)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -181,37 +157,30 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         action = request.form.get('action')
-
         if action == 'register':
             success, msg = user_manager.register(username, password)
             if success:
                 blockchain.add_transaction(username, 'reward', {'credits': 10, 'reason': 'Welcome Bonus'})
                 return render_template('login.html', message="Registered! Please login.")
-            else:
-                return render_template('login.html', error=msg)
-        
+            return render_template('login.html', error=msg)
         elif action == 'login':
             if user_manager.login(username, password):
                 session['user'] = username
                 return redirect(url_for('index'))
-            else:
-                return render_template('login.html', error="Invalid credentials")
-
+            return render_template('login.html', error="Invalid credentials")
     return render_template('login.html')
-
 
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     session.pop('last_results', None)
+    session.pop('last_credits', None)
     return redirect(url_for('login'))
-
 
 @app.route('/wallet', methods=['GET', 'POST'])
 def wallet():
     if 'user' not in session:
         return redirect(url_for('login'))
-    
     user = session['user']
     balance = blockchain.get_user_balance(user)
     all_users = [u for u in user_manager.get_all_users() if u != user]
@@ -222,75 +191,53 @@ def wallet():
             amount = float(request.form.get('amount'))
         except ValueError:
             return render_template('wallet.html', user=user, balance=balance, users=all_users, error="Invalid amount")
-        
         if amount > balance:
             return render_template('wallet.html', user=user, balance=balance, users=all_users, error="Insufficient funds")
-        
         blockchain.add_transaction(user, 'exchange', {'recipient': recipient, 'amount': amount})
         return redirect(url_for('wallet'))
-
+    
     return render_template('wallet.html', user=user, balance=balance, users=all_users)
-
 
 @app.route('/ledger')
 def ledger():
-    chain_data = [block.to_dict() for block in blockchain.chain]  # Convert to dicts first
     display_chain = []
-    for block_dict in chain_data:
-        b = block_dict.copy()
-        b['timestamp'] = datetime.datetime.fromtimestamp(block_dict['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
+    for block in blockchain.chain:
+        b = block.to_dict()
+        b['timestamp'] = datetime.datetime.fromtimestamp(b['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
         display_chain.append(b)
-        
     return render_template('ledger.html', chain=display_chain)
-
 
 @app.route('/leaderboard')
 def leaderboard():
-    users = user_manager.get_all_users()
     stats = []
-    
-    for u in users:
+    for u in user_manager.get_all_users():
         bal = blockchain.get_user_balance(u)
         total_emissions = 0
         eco_score_avg = 0
         count = 0
-        
         for block in blockchain.chain:
-            block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
-            
-            if block_dict.get('user_id') == u and block_dict.get('transaction_type') == 'emission':
-                total_emissions += block_dict.get('data', {}).get('net', 0)
-                eco_score_avg += block_dict.get('data', {}).get('score', 0)
-                count += 1
-        
-        avg_score = round(eco_score_avg / count) if count > 0 else 0
-        
-        stats.append({
-            'username': u,
-            'balance': bal,
-            'total_emissions': round(total_emissions, 2),
-            'eco_score': avg_score
-        })
+            b = block.to_dict() if hasattr(block, 'to_dict') else block
+            for tx in b.get("user_transactions", []):
+                if tx["user_id"] == u and tx["transaction_type"] == "carbon_emission":
+                    total_emissions += tx["data"].get("net", 0)
+                    eco_score_avg += tx["data"].get("score", 0)
+                    count += 1
+
+        avg_score = round(eco_score_avg / count) if count else 0
+        stats.append({'username': u, 'balance': bal, 'total_emissions': round(total_emissions, 2), 'eco_score': avg_score})
     
-    # Sort by Eco Score (desc) then Balance
     stats.sort(key=lambda x: (x['eco_score'], x['balance']), reverse=True)
-    
     return render_template('leaderboard.html', stats=stats)
 
+# --- Main server ---
+def run_server(port):
+    server = make_server('0.0.0.0', port, app)
+    server.serve_forever()
+
 if __name__ == '__main__':
-    from threading import Thread
-    from werkzeug.serving import make_server
-
-    def run_server(port):
-        server = make_server('0.0.0.0', port, app)
-        server.serve_forever()
-
     Thread(target=run_server, args=(3000,), daemon=True).start()
     Thread(target=run_server, args=(5000,), daemon=True).start()
-
-    print("🚀 App running on ports 3000 and 5000")
-
-    # keep main thread alive
-    import time
+    print(" App running on ports 3000 and 5000")
+    
     while True:
         time.sleep(1)
