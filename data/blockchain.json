@@ -700,5 +700,218 @@
     "difficulty": 2,
     "nonce": 322,
     "hash": "00540c8cb4b1be4b9e935ede878c20b83ed5f2fa836c51ebc625e2bf1a00e8d6"
+  },
+  {
+    "index": 27,
+    "timestamp": 1769703160.8850665,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "ret",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769703160.8850582
+      }
+    ],
+    "prev_hash": "00540c8cb4b1be4b9e935ede878c20b83ed5f2fa836c51ebc625e2bf1a00e8d6",
+    "difficulty": 2,
+    "nonce": 172,
+    "hash": "009b49b14b1b1fcb9caa1390c77097e3e9137e5159ef7a05443b947c17456b27"
+  },
+  {
+    "index": 28,
+    "timestamp": 1769703160.8884523,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "ret",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769703160.8884459
+      }
+    ],
+    "prev_hash": "009b49b14b1b1fcb9caa1390c77097e3e9137e5159ef7a05443b947c17456b27",
+    "difficulty": 2,
+    "nonce": 3,
+    "hash": "009eb11c2e23b19bfac032eec0967f4949ca0addc2991fb90392359067f4f23d"
+  },
+  {
+    "index": 29,
+    "timestamp": 1769703996.8666232,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "ret",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.0,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.0,
+          "offset": 0.0,
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769703996.8666131
+      }
+    ],
+    "prev_hash": "009eb11c2e23b19bfac032eec0967f4949ca0addc2991fb90392359067f4f23d",
+    "difficulty": 2,
+    "nonce": 280,
+    "hash": "00bdccaff3bdfe4bb516116de5beebd49d24d48ac5b4b889e98dc24e676a4463"
+  },
+  {
+    "index": 30,
+    "timestamp": 1769703996.8716085,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "ret",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769703996.8716018
+      }
+    ],
+    "prev_hash": "00bdccaff3bdfe4bb516116de5beebd49d24d48ac5b4b889e98dc24e676a4463",
+    "difficulty": 2,
+    "nonce": 209,
+    "hash": "009ddb7551badd327b2ce0265931e3f37cdb7868a000cb48ee1e786aa9592b20"
+  },
+  {
+    "index": 31,
+    "timestamp": 1769704031.476931,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "ret",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "distance": "10",
+            "ac_hours": "1",
+            "screen_hours": "2",
+            "tv_hours": "2",
+            "lighting_hours": "8",
+            "home_meals": "3",
+            "water_liters": "1",
+            "has_solar": "yes",
+            "solar_kwh": "1",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.8,
+            "electricity": 2.03,
+            "food_water": 2.4
+          },
+          "gross": 5.23,
+          "offset": 0.82,
+          "net": 4.41,
+          "score": 70
+        },
+        "timestamp": 1769704031.476925
+      }
+    ],
+    "prev_hash": "009ddb7551badd327b2ce0265931e3f37cdb7868a000cb48ee1e786aa9592b20",
+    "difficulty": 2,
+    "nonce": 98,
+    "hash": "00bea8694fd95a6433429f2ae08b9b38817d6f10343a4472048a006e8ebd0f6f"
+  },
+  {
+    "index": 32,
+    "timestamp": 1769704031.480004,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "ret",
+        "data": {
+          "credits": 10.2,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769704031.4799998
+      }
+    ],
+    "prev_hash": "00bea8694fd95a6433429f2ae08b9b38817d6f10343a4472048a006e8ebd0f6f",
+    "difficulty": 2,
+    "nonce": 37,
+    "hash": "003be691a424158ed4d6e4ab5d5182777168688da0364c41c6643ce8b5e0e62d"
+  },
+  {
+    "index": 33,
+    "timestamp": 1769704167.815976,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "tre",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "distance": "10",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "breakdown": {
+            "transport": 0.8,
+            "electricity": 0.0,
+            "food_water": 0.0
+          },
+          "gross": 0.8,
+          "offset": 0.0,
+          "net": 0.8,
+          "score": 94
+        },
+        "timestamp": 1769704167.8159673
+      }
+    ],
+    "prev_hash": "003be691a424158ed4d6e4ab5d5182777168688da0364c41c6643ce8b5e0e62d",
+    "difficulty": 2,
+    "nonce": 84,
+    "hash": "000ebbb57443ce8e2f7bf96327690743cabaa3cd7d1370172d7cfddb2cf2a951"
+  },
+  {
+    "index": 34,
+    "timestamp": 1769704167.818755,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "tre",
+        "data": {
+          "credits": 22.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769704167.8187478
+      }
+    ],
+    "prev_hash": "000ebbb57443ce8e2f7bf96327690743cabaa3cd7d1370172d7cfddb2cf2a951",
+    "difficulty": 2,
+    "nonce": 501,
+    "hash": "00ac6974f10ec93344087eaa6b1ac7168a864a0908490a5697884bb9b575e95e"
   }
 ]

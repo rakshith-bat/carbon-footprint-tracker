@@ -64,7 +64,7 @@ blockchain = Blockchain()
 if not os.path.exists(Config.DATA_DIR):
     os.makedirs(Config.DATA_DIR)
 
-print("🔥 USING REAL app.py 🔥")
+print(" USING REAL blockchain INSTANCE ")
 
 
 @app.route('/')
@@ -94,6 +94,9 @@ def index():
                     pass
 
             results = calculate_daily_emissions(data)
+            # normalize naming for templates
+            results['net'] = results['net_emissions']
+
             credits = calculate_green_credits(results['net_emissions'], results['renewable_kwh'], results['eco_score'])
             
             tx_data = {

@@ -1,49 +1,77 @@
+import time
+
 class GlobalState:
     def __init__(self):
-        # Maps user names to their current status
-        self.accounts = {} 
+        self.accounts = {}
 
-    def get_account(self, user):
-        """Initialize account if it doesn't exist"""
-        if user not in self.accounts:
-            self.accounts[user] = {
-                "balance": 0.0,       # Carbon Credits
-                "total_co2": 0.0,     # Total emissions logged
-                "total_kwh": 0.0,     # Total energy used
-                "green_points": 0,    # Number of Green tags earned
-                "reputation": 50.0    # Starts at 50, goes up or down
+    # ----------------------------------
+    # Helpers
+    # ----------------------------------
+    def ensure_account(self, user_id):
+        if user_id not in self.accounts:
+            self.accounts[user_id] = {
+                "balance": 0.0,
+                "total_emissions": 0.0,
+                "eco_score_sum": 0,
+                "emission_count": 0,
+                "created_at": time.time()
             }
-        return self.accounts[user]
 
+    def get_account(self, user_id):
+        self.ensure_account(user_id)
+        return self.accounts[user_id]
+
+    # ----------------------------------
+    # Core logic
+    # ----------------------------------
     def apply_block(self, block):
-        """Scan a block and update the global state based on transactions"""
         for tx in block.transactions:
-            user = tx.get("user")
             tx_type = tx.get("type")
+            user = tx.get("user")
             data = tx.get("data", {})
 
-            if not user or user == "SYSTEM":
+            if not user:
                 continue
 
-            account = self.get_account(user)
+            # ---------- EMISSION ----------
+            if tx_type == "carbon_emission":
+                self.ensure_account(user)
+                net = float(data.get("net", 0))
+                score = int(data.get("score", 0))
 
-            # Logic for Carbon Logging Transactions
-            if tx_type == "carbon_footprint_entry":
-                account["total_co2"] += data.get("co2", 0)
-                account["total_kwh"] += data.get("kwh", 0)
-                
-                if data.get("tag") == "GREEN":
-                    account["green_points"] += 1
-                    account["reputation"] = min(100, account["reputation"] + 2)
-                elif data.get("tag") == "RED":
-                    account["reputation"] = max(0, account["reputation"] - 5)
+                self.accounts[user]["total_emissions"] += net
+                self.accounts[user]["eco_score_sum"] += score
+                self.accounts[user]["emission_count"] += 1
 
-            # Logic for Reward Transactions
+            # ---------- REWARD ----------
             elif tx_type == "carbon_credit_reward":
-                account["balance"] += data.get("amount", 0)
+                credits = float(data.get("credits", 0))
+                self.ensure_account(user)
+                self.accounts[user]["balance"] += credits
 
+            # ---------- TRANSFER ----------
+            elif tx_type == "credit_transfer":
+                sender = user
+                recipient = data.get("recipient")
+                amount = float(data.get("amount", 0))
+
+                if not recipient:
+                    continue
+
+                self.ensure_account(sender)
+                self.ensure_account(recipient)
+
+                self.accounts[sender]["balance"] -= amount
+                self.accounts[recipient]["balance"] += amount
+
+            # ---------- GENESIS ----------
+            elif tx_type == "GENESIS":
+                pass
+
+    # ----------------------------------
+    # 🔥 THIS WAS THE MISSING PIECE
+    # ----------------------------------
     def rebuild_from_chain(self, chain):
-        """Wipe state and re-process the entire chain to ensure accuracy"""
         self.accounts = {}
         for block in chain:
             self.apply_block(block)
