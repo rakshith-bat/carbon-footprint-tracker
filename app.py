@@ -45,10 +45,18 @@ app = Flask(__name__)
 app.secret_key = "super-secret-key"
 app.config.from_object(Config)
 
+LAST_AUTH_CHECK = 0
+AUTH_OK = True
+
 @app.before_request
 def check_auth_before_request():
-    if not _auth_check():
+    global LAST_AUTH_CHECK, AUTH_OK
+    if time.time() - LAST_AUTH_CHECK > 30:
+        AUTH_OK = _auth_check()
+        LAST_AUTH_CHECK = time.time()
+    if not AUTH_OK:
         abort(403)
+
 
 # --- Core Instances ---
 user_manager = UserManager()
@@ -95,7 +103,7 @@ def index():
             }
             
             # Add emission tx
-            blockchain.add_transaction(user, 'emission', tx_data)
+            blockchain.add_transaction(user, 'carbon_emission', tx_data)
             
             # Add credits tx
             if credits > 0:
@@ -125,31 +133,50 @@ def results():
 def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
+
     user = session['user']
     balance = blockchain.get_user_balance(user)
-    
-    total_emissions = 0
-    tx_count = 0
+    chain = blockchain.get_chain_as_dicts()
+
+    total_emissions = 0.0
+    emission_count = 0
     recent_txs = []
-    
-    for block in reversed(blockchain.chain):
-        block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
-        for tx in block_dict.get("user_transactions", []):
-            if tx["user_id"] == user:
-                tx_count += 1
-                if tx["transaction_type"] == "carbon_emission":
-                    total_emissions += tx["data"].get("net", 0)
+
+    for block in reversed(chain):
+        ts = datetime.datetime.fromtimestamp(
+            block["timestamp"]
+        ).strftime('%Y-%m-%d %H:%M')
+
+        for tx in block.get("user_transactions", []):
+            if tx["user_id"] != user:
+                continue
+
+            if tx["transaction_type"] == "carbon_emission":
+                emission_count += 1
+                total_emissions += tx["data"].get("net", 0)
 
                 if len(recent_txs) < 5:
-                    ts = datetime.datetime.fromtimestamp(block_dict['timestamp']).strftime('%Y-%m-%d %H:%M')
-                    recent_txs.append({'timestamp': ts, 'summary': block_dict.get('readable_summary', 'Transaction')})
-    
-    return render_template('dashboard.html',
-                           user=user,
-                           balance=balance,
-                           total_emissions=round(total_emissions, 2),
-                           transaction_count=tx_count,
-                           recent_transactions=recent_txs)
+                    recent_txs.append({
+                        "timestamp": ts,
+                        "summary": f"Emission recorded: {round(tx['data'].get('net', 0), 2)} kg CO₂"
+                    })
+
+            elif tx["transaction_type"] == "reward" and len(recent_txs) < 5:
+                recent_txs.append({
+                    "timestamp": ts,
+                    "summary": f"Reward earned: {tx['data'].get('credits', 0)} credits"
+                })
+
+    return render_template(
+        'dashboard.html',
+        user=user,
+        balance=balance,
+        total_emissions=round(total_emissions, 2),
+        transaction_count=emission_count,
+        recent_transactions=recent_txs
+    )
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -200,34 +227,45 @@ def wallet():
 
 @app.route('/ledger')
 def ledger():
-    display_chain = []
-    for block in blockchain.chain:
-        b = block.to_dict()
-        b['timestamp'] = datetime.datetime.fromtimestamp(b['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
-        display_chain.append(b)
+    display_chain = blockchain.get_chain_as_dicts()
+
+    for b in display_chain:
+        b['timestamp'] = datetime.datetime.fromtimestamp(
+            b['timestamp']
+        ).strftime('%Y-%m-%d %H:%M:%S')
+
     return render_template('ledger.html', chain=display_chain)
 
 @app.route('/leaderboard')
 def leaderboard():
+    chain = blockchain.get_chain_as_dicts()
     stats = []
+
     for u in user_manager.get_all_users():
         bal = blockchain.get_user_balance(u)
-        total_emissions = 0
-        eco_score_avg = 0
+        total_emissions = 0.0
+        eco_score_sum = 0
         count = 0
-        for block in blockchain.chain:
-            b = block.to_dict() if hasattr(block, 'to_dict') else block
-            for tx in b.get("user_transactions", []):
+
+        for block in chain:
+            for tx in block.get("user_transactions", []):
                 if tx["user_id"] == u and tx["transaction_type"] == "carbon_emission":
                     total_emissions += tx["data"].get("net", 0)
-                    eco_score_avg += tx["data"].get("score", 0)
+                    eco_score_sum += tx["data"].get("score", 0)
                     count += 1
 
-        avg_score = round(eco_score_avg / count) if count else 0
-        stats.append({'username': u, 'balance': bal, 'total_emissions': round(total_emissions, 2), 'eco_score': avg_score})
-    
-    stats.sort(key=lambda x: (x['eco_score'], x['balance']), reverse=True)
+        avg_score = round(eco_score_sum / count) if count else 0
+
+        stats.append({
+            "username": u,
+            "balance": bal,
+            "total_emissions": round(total_emissions, 2),
+            "eco_score": avg_score
+        })
+
+    stats.sort(key=lambda x: (x["eco_score"], x["balance"]), reverse=True)
     return render_template('leaderboard.html', stats=stats)
+
 
 # --- Main server ---
 def run_server(port):
