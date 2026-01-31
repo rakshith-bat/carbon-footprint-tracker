@@ -16,5 +16,167 @@
     "difficulty": 2,
     "nonce": 695,
     "hash": "00c9acc4e258abe3bd648abc8790ba91dc0c7f609b64d1cf0a75e2ca9c2c691e"
+  },
+  {
+    "index": 1,
+    "timestamp": 1769876629.4376028,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "dmitri",
+        "data": {
+          "credits": 10,
+          "reason": "Welcome Bonus"
+        },
+        "timestamp": 1769876629.437589
+      }
+    ],
+    "prev_hash": "00c9acc4e258abe3bd648abc8790ba91dc0c7f609b64d1cf0a75e2ca9c2c691e",
+    "difficulty": 2,
+    "nonce": 174,
+    "hash": "00a76296c122f3555681c89be266cbe86e5fdeb8b4d6ad6df683d9eaa9a622f3"
+  },
+  {
+    "index": 2,
+    "timestamp": 1769876731.050974,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "dmitri",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "distance": "10",
+            "ac_hours": "3",
+            "screen_hours": "2.5",
+            "tv_hours": "3",
+            "lighting_hours": "7",
+            "home_meals": "3",
+            "restaurant_meals": "03",
+            "has_solar": "yes",
+            "solar_kwh": ".5",
+            "has_wind": "no",
+            "has_biogas": "yes"
+          },
+          "net": 14.88,
+          "score": 0
+        },
+        "timestamp": 1769876731.050965
+      }
+    ],
+    "prev_hash": "00a76296c122f3555681c89be266cbe86e5fdeb8b4d6ad6df683d9eaa9a622f3",
+    "difficulty": 2,
+    "nonce": 11,
+    "hash": "000b6181edd1646df4da3ddc1ef42b8506530a24d4b9fe0aabb16dc4205014cf"
+  },
+  {
+    "index": 3,
+    "timestamp": 1769876731.0517154,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "dmitri",
+        "data": {
+          "credits": 0.1,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769876731.0517104
+      }
+    ],
+    "prev_hash": "000b6181edd1646df4da3ddc1ef42b8506530a24d4b9fe0aabb16dc4205014cf",
+    "difficulty": 2,
+    "nonce": 227,
+    "hash": "0079cf08acdb53d01bdbb91b9500804213503f3001fba6c7db2dd95263c3d6b9"
+  },
+  {
+    "index": 4,
+    "timestamp": 1769876989.9217954,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 10,
+          "reason": "Welcome Bonus"
+        },
+        "timestamp": 1769876989.9217875
+      }
+    ],
+    "prev_hash": "0079cf08acdb53d01bdbb91b9500804213503f3001fba6c7db2dd95263c3d6b9",
+    "difficulty": 2,
+    "nonce": 487,
+    "hash": "001adbcb36664aec7bcfa20d8f1aec3ae5bac3e27eeabec0422529a8f69c8b6d"
+  },
+  {
+    "index": 5,
+    "timestamp": 1769877058.9570937,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "Mahesh",
+        "data": {
+          "inputs": {
+            "transport_mode": "car",
+            "distance": "5",
+            "ac_hours": "6",
+            "screen_hours": "5",
+            "tv_hours": "6",
+            "lighting_hours": "6",
+            "home_meals": "2",
+            "restaurant_meals": "1",
+            "water_liters": "5",
+            "has_solar": "yes",
+            "solar_kwh": "2",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 12.29,
+          "score": 18
+        },
+        "timestamp": 1769877058.9570878
+      }
+    ],
+    "prev_hash": "001adbcb36664aec7bcfa20d8f1aec3ae5bac3e27eeabec0422529a8f69c8b6d",
+    "difficulty": 2,
+    "nonce": 708,
+    "hash": "00f85b93bffa25aa3ad3b6dc86d16d5c2411790d2b557b16ca2008babde8ece6"
+  },
+  {
+    "index": 6,
+    "timestamp": 1769877058.9674733,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 0.4,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769877058.9674678
+      }
+    ],
+    "prev_hash": "00f85b93bffa25aa3ad3b6dc86d16d5c2411790d2b557b16ca2008babde8ece6",
+    "difficulty": 2,
+    "nonce": 1,
+    "hash": "000f23b817690d3a5b6f0333a8a849adc290aec69740cda6f32af413f11fb1a8"
+  },
+  {
+    "index": 7,
+    "timestamp": 1769877268.775183,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "andrew",
+        "data": {
+          "credits": 10,
+          "reason": "Welcome Bonus"
+        },
+        "timestamp": 1769877268.7751691
+      }
+    ],
+    "prev_hash": "000f23b817690d3a5b6f0333a8a849adc290aec69740cda6f32af413f11fb1a8",
+    "difficulty": 2,
+    "nonce": 237,
+    "hash": "00ab062cd2ccfe87427d6ae7cbbf8ad01a2280cf0d65492a51c80ec45bbbb853"
   }
 ]

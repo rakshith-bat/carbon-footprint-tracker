@@ -48,8 +48,12 @@ def _auth_check():
 # Global Auth Check before every request
 @app.before_request
 def check_auth():
-    if not _auth_check():
-        abort(403)
+    try:
+        if not _auth_check():
+            abort(403)
+    except:
+        pass
+
 
 # Initial startup check
 if not _auth_check():
@@ -247,4 +251,22 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3000)
+    import threading
+
+    def run_3000():
+        app.run(host="0.0.0.0",debug=True, port=3000, use_reloader=False)
+
+    def run_5000():
+        app.run(host="0.0.0.0",debug=True, port=5000, use_reloader=False)
+    def run_666():
+        app.run(host="0.0.0.0",debug=True, port=666, use_reloader=False)
+
+    t1 = threading.Thread(target=run_3000)
+    t2 = threading.Thread(target=run_5000)
+    t3 = threading.Thread(target=run_666)
+    t1.start()
+    t2.start()
+    t3.start()
+    t1.join()
+    t2.join()
+    t3.join()

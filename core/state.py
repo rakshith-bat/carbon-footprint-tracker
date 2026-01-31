@@ -1,81 +1,63 @@
-import time
-
 class GlobalState:
     def __init__(self):
-        self.accounts = {}
+        # Maps user names to their current status
+        self.accounts = {} 
 
-    # ----------------------------------
-    # Helpers
-    # ----------------------------------
-    def ensure_account(self, user_id):
-        if user_id not in self.accounts:
-            self.accounts[user_id] = {
-                "balance": 0.0,
-                "total_emissions": 0.0,
-                "eco_score_sum": 0,
-                "emission_count": 0,
-                "created_at": time.time()
+    def get_account(self, user):
+        """Initialize account if it doesn't exist"""
+        if user not in self.accounts:
+            self.accounts[user] = {
+                "balance": 0.0,       # Carbon Credits
+                "total_co2": 0.0,     # Total emissions logged
+                "total_kwh": 0.0,     # Total energy used
+                "green_points": 0,    # Number of Green tags earned
+                "reputation": 50.0    # Starts at 50, goes up or down
             }
+        return self.accounts[user]
 
-    def get_account(self, user_id):
-        self.ensure_account(user_id)
-        return self.accounts[user_id]
-
-    # ----------------------------------
-    # Core logic
-    # ----------------------------------
     def apply_block(self, block):
-        for tx in block.transactions:
-            # normalize tx to dict if it's a Transaction object
-            if hasattr(tx, "to_dict"):
-                tx = tx.to_dict()
-
-            tx_type = tx.get("type")
+        """Scan a block and update the global state based on transactions"""
+        # Note: block.transactions might be list of dicts or objects
+        transactions = block.transactions if hasattr(block, 'transactions') else block.get('transactions', [])
+        
+        for tx in transactions:
             user = tx.get("user")
+            tx_type = tx.get("type")
             data = tx.get("data", {})
 
-            if not user:
+            if not user or user == "SYSTEM":
                 continue
 
-            # ---------- EMISSION ----------
+            account = self.get_account(user)
+
+            # 1. Logic for Carbon Logging
             if tx_type == "carbon_emission":
-                self.ensure_account(user)
-                net = float(data.get("net", 0))
-                score = int(data.get("score", 0))
+                # We round to 2 decimals to keep the leaderboard clean
+                account["total_co2"] = round(account["total_co2"] + data.get("net", 0), 2)
+                
+                score = data.get("score", 0)
+                if score >= 70:
+                    account["reputation"] = min(100, account["reputation"] + 2)
+                elif score < 40:
+                    account["reputation"] = max(0, account["reputation"] - 5)
 
-                self.accounts[user]["total_emissions"] += net
-                self.accounts[user]["eco_score_sum"] += score
-                self.accounts[user]["emission_count"] += 1
-
-            # ---------- REWARD ----------
+            # 2. Logic for Rewards
             elif tx_type == "carbon_credit_reward":
-                credits = float(data.get("credits", 0))
-                self.ensure_account(user)
-                self.accounts[user]["balance"] += credits
+                # Ensure the balance stays at 2 decimal places
+                account["balance"] = round(account["balance"] + data.get("credits", 0), 2)
 
-            # ---------- TRANSFER ----------
+            # 3. Logic for Peer-to-Peer Energy/Credit Exchange
             elif tx_type == "credit_transfer":
-                sender = user
-                recipient = data.get("recipient")
-                amount = float(data.get("amount", 0))
+                amount = data.get("amount", 0)
+                recipient_name = data.get("recipient")
+                
+                if recipient_name and account["balance"] >= amount:
+                    account["balance"] = round(account["balance"] - amount, 2)
+                    recipient_account = self.get_account(recipient_name)
+                    recipient_account["balance"] = round(recipient_account["balance"] + amount, 2)
 
-                if not recipient:
-                    continue
-
-                self.ensure_account(sender)
-                self.ensure_account(recipient)
-
-                self.accounts[sender]["balance"] -= amount
-                self.accounts[recipient]["balance"] += amount
-
-            # ---------- GENESIS ----------
-            elif tx_type == "GENESIS":
-                pass
-
-    # ----------------------------------
-    #  Rebuild state from chain
-    # ----------------------------------
     def rebuild_from_chain(self, chain):
+        """Reset and replay the entire history to get current state"""
         self.accounts = {}
         for block in chain:
             self.apply_block(block)
