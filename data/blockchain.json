@@ -178,5 +178,50 @@
     "difficulty": 2,
     "nonce": 237,
     "hash": "00ab062cd2ccfe87427d6ae7cbbf8ad01a2280cf0d65492a51c80ec45bbbb853"
+  },
+  {
+    "index": 8,
+    "timestamp": 1769952895.7974405,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "dmitri",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "distance": "12",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 0.96,
+          "score": 93
+        },
+        "timestamp": 1769952895.7974267
+      }
+    ],
+    "prev_hash": "00ab062cd2ccfe87427d6ae7cbbf8ad01a2280cf0d65492a51c80ec45bbbb853",
+    "difficulty": 2,
+    "nonce": 516,
+    "hash": "0073b67bec4aeb5b9b67cb0467c48817af53fefdabcaa894371e5570cac76cef"
+  },
+  {
+    "index": 9,
+    "timestamp": 1769952895.8081303,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "dmitri",
+        "data": {
+          "credits": 21.5,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769952895.8081214
+      }
+    ],
+    "prev_hash": "0073b67bec4aeb5b9b67cb0467c48817af53fefdabcaa894371e5570cac76cef",
+    "difficulty": 2,
+    "nonce": 934,
+    "hash": "00f298347954d76de23fb645f1c9c211ca608feb1b01bf022d5a9adf7a0ec9e7"
   }
 ]
