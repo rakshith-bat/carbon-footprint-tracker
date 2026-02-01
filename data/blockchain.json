@@ -223,5 +223,279 @@
     "difficulty": 2,
     "nonce": 934,
     "hash": "00f298347954d76de23fb645f1c9c211ca608feb1b01bf022d5a9adf7a0ec9e7"
+  },
+  {
+    "index": 10,
+    "timestamp": 1769953572.8942719,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "Mahesh",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "distance": "2",
+            "ac_hours": "1",
+            "screen_hours": "2.5",
+            "tv_hours": "4",
+            "lighting_hours": "8",
+            "home_meals": "1",
+            "restaurant_meals": "3",
+            "water_liters": "6",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "yes",
+            "biogas_kwh": "1.2"
+          },
+          "net": 9.74,
+          "score": 35
+        },
+        "timestamp": 1769953572.894262
+      }
+    ],
+    "prev_hash": "00f298347954d76de23fb645f1c9c211ca608feb1b01bf022d5a9adf7a0ec9e7",
+    "difficulty": 2,
+    "nonce": 254,
+    "hash": "005a7e33496ec1064905c0e6fab8fcdf01cf52790d6723a0ca28161dd5cd81bf"
+  },
+  {
+    "index": 11,
+    "timestamp": 1769953572.8982446,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 0.24,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769953572.8982375
+      }
+    ],
+    "prev_hash": "005a7e33496ec1064905c0e6fab8fcdf01cf52790d6723a0ca28161dd5cd81bf",
+    "difficulty": 2,
+    "nonce": 9,
+    "hash": "00cc737f257e675e26df9bb84a48b70634d81e550aa18d2931317bcc49ac8d3e"
+  },
+  {
+    "index": 12,
+    "timestamp": 1769954077.951559,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "Mahesh",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "distance": "2",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 0.16,
+          "score": 98
+        },
+        "timestamp": 1769954077.951545
+      }
+    ],
+    "prev_hash": "00cc737f257e675e26df9bb84a48b70634d81e550aa18d2931317bcc49ac8d3e",
+    "difficulty": 2,
+    "nonce": 45,
+    "hash": "00e92bf35c3eef2429fe2bc67ed3b1d6d167505b57f0e44949854cc7c4564101"
+  },
+  {
+    "index": 13,
+    "timestamp": 1769954077.9532552,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 24.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769954077.9532468
+      }
+    ],
+    "prev_hash": "00e92bf35c3eef2429fe2bc67ed3b1d6d167505b57f0e44949854cc7c4564101",
+    "difficulty": 2,
+    "nonce": 854,
+    "hash": "00fafb22c3bc5391444bc1c45eac27ce522685d9a661772c0af67b2081bb29a7"
+  },
+  {
+    "index": 14,
+    "timestamp": 1769954087.4351006,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "Mahesh",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769954087.4350948
+      }
+    ],
+    "prev_hash": "00fafb22c3bc5391444bc1c45eac27ce522685d9a661772c0af67b2081bb29a7",
+    "difficulty": 2,
+    "nonce": 8,
+    "hash": "00c63441cab19a32d98ac153ab4e7624d6316ff392a041be254c12d17f24e9a8"
+  },
+  {
+    "index": 15,
+    "timestamp": 1769954087.4360714,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769954087.436068
+      }
+    ],
+    "prev_hash": "00c63441cab19a32d98ac153ab4e7624d6316ff392a041be254c12d17f24e9a8",
+    "difficulty": 2,
+    "nonce": 164,
+    "hash": "004a1faa08fea4c71fc950babf66c9aeacb9db1b21ccda0461a061bd427ee55b"
+  },
+  {
+    "index": 16,
+    "timestamp": 1769954087.559102,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "Mahesh",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769954087.559096
+      }
+    ],
+    "prev_hash": "004a1faa08fea4c71fc950babf66c9aeacb9db1b21ccda0461a061bd427ee55b",
+    "difficulty": 2,
+    "nonce": 83,
+    "hash": "0081c4ceea531feb9bcf56e5f0ea3bcd57d1559ee24a88678b11002fc6d2cc43"
+  },
+  {
+    "index": 17,
+    "timestamp": 1769954087.5608957,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769954087.5608907
+      }
+    ],
+    "prev_hash": "0081c4ceea531feb9bcf56e5f0ea3bcd57d1559ee24a88678b11002fc6d2cc43",
+    "difficulty": 2,
+    "nonce": 157,
+    "hash": "00e823e82114e6f592fa4cf0f48ef98182859672022122d61929f84aaabd64cb"
+  },
+  {
+    "index": 18,
+    "timestamp": 1769954087.7534502,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "Mahesh",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769954087.7534442
+      }
+    ],
+    "prev_hash": "00e823e82114e6f592fa4cf0f48ef98182859672022122d61929f84aaabd64cb",
+    "difficulty": 2,
+    "nonce": 249,
+    "hash": "00e66c9b69abe9ccc1179ecb502253c24b90469f72f43c434af470d3bde69045"
+  },
+  {
+    "index": 19,
+    "timestamp": 1769954087.7567906,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769954087.756786
+      }
+    ],
+    "prev_hash": "00e66c9b69abe9ccc1179ecb502253c24b90469f72f43c434af470d3bde69045",
+    "difficulty": 2,
+    "nonce": 200,
+    "hash": "002db0298e1066cedbca0411d1e3afad57da833de33e2eaa88f51357e3447ebb"
+  },
+  {
+    "index": 20,
+    "timestamp": 1769954108.5251284,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "Mahesh",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 0,
+          "score": 100
+        },
+        "timestamp": 1769954108.5251217
+      }
+    ],
+    "prev_hash": "002db0298e1066cedbca0411d1e3afad57da833de33e2eaa88f51357e3447ebb",
+    "difficulty": 2,
+    "nonce": 147,
+    "hash": "0064b3a81337f6ef69a0e128fbe2f86b60dfc10e5ba45ad708206a14f9aabd99"
+  },
+  {
+    "index": 21,
+    "timestamp": 1769954108.5276837,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "Mahesh",
+        "data": {
+          "credits": 25.0,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1769954108.5276785
+      }
+    ],
+    "prev_hash": "0064b3a81337f6ef69a0e128fbe2f86b60dfc10e5ba45ad708206a14f9aabd99",
+    "difficulty": 2,
+    "nonce": 161,
+    "hash": "00d30eef1d7ebd6a62355061ad80e73bd3e2cce13e3fa1969d53e52d7d326bab"
   }
 ]
