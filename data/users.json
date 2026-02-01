@@ -1,0 +1,14 @@
+{
+    "dmitri": {
+        "password": "65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5",
+        "joined_at": "posix.times_result(user=0.25, system=0.06, children_user=0.0, children_system=0.0, elapsed=4298231.37)"
+    },
+    "kumar": {
+        "password": "8698df0ec492e5026b61ae25e429f82dea81eb962c5fbfa8ed3fd2ac72a968b2",
+        "joined_at": "posix.times_result(user=0.35, system=0.08, children_user=0.0, children_system=0.0, elapsed=4298288.21)"
+    },
+    "parth": {
+        "password": "5d5653c4eb4f09a3c5a14b499ceea37a9f025f9e7105c407eb09d81e6d4430c6",
+        "joined_at": "posix.times_result(user=0.42, system=0.1, children_user=0.0, children_system=0.0, elapsed=4298360.41)"
+    }
+}
