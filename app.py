@@ -59,7 +59,7 @@ def check_auth():
 if not _auth_check():
     sys.exit("AUTH FAILED: Startup check failed.")
 
-print("🔥 APP STARTING: Blockchain Carbon Tracker Active 🔥")
+print(" APP STARTING: Blockchain Carbon Tracker Active ")
 
 # --- ROUTES ---
 
