@@ -73,5 +73,88 @@
     "difficulty": 2,
     "nonce": 838,
     "hash": "001eadef1383b61ba9cab50229e304bac9e8c67cef7127180f8ae137c654eb14"
+  },
+  {
+    "index": 4,
+    "timestamp": 1770570147.7318797,
+    "transactions": [
+      {
+        "type": "carbon_emission",
+        "user": "dmitri",
+        "data": {
+          "inputs": {
+            "transport_mode": "public",
+            "distance": "12",
+            "has_solar": "no",
+            "has_wind": "no",
+            "has_biogas": "no"
+          },
+          "net": 0.96,
+          "score": 93
+        },
+        "timestamp": 1770570147.7318683
+      }
+    ],
+    "prev_hash": "001eadef1383b61ba9cab50229e304bac9e8c67cef7127180f8ae137c654eb14",
+    "difficulty": 2,
+    "nonce": 268,
+    "hash": "00032ac46d87e9054731801add032436f531f34eb23a5d8d5c5e121110f30108"
+  },
+  {
+    "index": 5,
+    "timestamp": 1770570147.7356184,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "dmitri",
+        "data": {
+          "credits": 21.5,
+          "reason": "Eco-Score Reward"
+        },
+        "timestamp": 1770570147.7356057
+      }
+    ],
+    "prev_hash": "00032ac46d87e9054731801add032436f531f34eb23a5d8d5c5e121110f30108",
+    "difficulty": 2,
+    "nonce": 434,
+    "hash": "000857a2aa809f41625c81664d7a930ac0205a057c1f83a28e5178c22325ea87"
+  },
+  {
+    "index": 6,
+    "timestamp": 1770571524.0375519,
+    "transactions": [
+      {
+        "type": "carbon_credit_reward",
+        "user": "abc",
+        "data": {
+          "credits": 10,
+          "reason": "Welcome Bonus"
+        },
+        "timestamp": 1770571524.0375402
+      }
+    ],
+    "prev_hash": "000857a2aa809f41625c81664d7a930ac0205a057c1f83a28e5178c22325ea87",
+    "difficulty": 2,
+    "nonce": 171,
+    "hash": "0040ac32f27d73b76c1c340ea42e9153fe8e30794b6e899c00909e961b8cc0dd"
+  },
+  {
+    "index": 7,
+    "timestamp": 1770573625.416787,
+    "transactions": [
+      {
+        "type": "credit_transfer",
+        "user": "dmitri",
+        "data": {
+          "recipient": "parth",
+          "amount": 11.8
+        },
+        "timestamp": 1770573625.4167776
+      }
+    ],
+    "prev_hash": "0040ac32f27d73b76c1c340ea42e9153fe8e30794b6e899c00909e961b8cc0dd",
+    "difficulty": 2,
+    "nonce": 50,
+    "hash": "00a171f7aaa21c5630c165318940340b8984533484dcba9b12f98afa0a5cb9fd"
   }
 ]
