@@ -83,8 +83,9 @@ def index():
         return redirect(url_for('login'))
 
     user = session['user']
-    
     user_data = user_manager.get_user(user)
+    if not user_data:
+        return redirect(url_for('login'))
     if user_data.get('user_type') == 'vendor':
         return redirect(url_for('vendor'))
     user_state = user_data.get('city', 'Other')
@@ -208,6 +209,9 @@ def analyst():
         return redirect(url_for('login'))
 
     user = session['user']
+    user_data = user_manager.get_user(user)
+    if not user_data:
+        return redirect(url_for('login'))
     if user_data.get('user_type') == 'vendor':
         return redirect(url_for('vendor'))
     user_data = user_manager.get_user(user)

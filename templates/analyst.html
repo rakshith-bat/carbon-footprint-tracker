@@ -40,7 +40,7 @@
 
         <div class="cyber-panel" style="text-align:center; padding:24px;">
             <p style="color:var(--text-secondary); font-size:0.72rem; margin-bottom:8px;">TODAY</p>
-            <h3 style="font-size:2rem; color:{% if report.today_net and report.personal_avg and report.today_net < report.personal_avg %}var(--accent-green){% elif report.today_net %}var(--accent-red){% else %}var(--text-secondary){% endif %};"></h3>
+            <h3 style="font-size:2rem; color:{% if report.today_net and report.personal_avg and report.today_net < report.personal_avg %}var(--accent-green){% elif report.today_net %}var(--accent-red){% else %}var(--text-secondary){% endif %};">
                 {{ report.today_net or '—' }}
             </h3>
             <p style="color:var(--text-secondary); font-size:0.72rem;">kg CO2</p>
@@ -83,7 +83,7 @@
                 <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
                     <span style="color:var(--text-secondary); font-size:0.8rem;">vs {{ user_state }}</span>
                     <span style="font-family:'JetBrains Mono'; font-size:0.8rem;
-                                  color:{% if report.vs_state and report.vs_state > 0 %}var(--accent-green){% elif report.vs_state and report.vs_state < 0 %}var(--accent-red){% else %}var(--text-secondary){% endif %};
+                                  color:{% if report.vs_state and report.vs_state > 0 %}var(--accent-green){% elif report.vs_state and report.vs_state < 0 %}var(--accent-red){% else %}var(--text-secondary){% endif %};">
                         {% if report.vs_state %}
                             {% if report.vs_state > 0 %}+{{ report.vs_state }}% better
                             {% else %}{{ report.vs_state }}% worse{% endif %}
@@ -94,7 +94,8 @@
                     {% if report.vs_state %}
                     <div style="height:4px; border-radius:2px;
                                  width:{{ [report.vs_state|abs, 100]|min }}%;
-                                 background:{% if report.vs_state and report.vs_state > 0 %}var(--accent-green){% else %}var(--accent-red){% endif %};</div>
+                                 background:{% if report.vs_state and report.vs_state > 0 %}var(--accent-green){% else %}var(--accent-red){% endif %};">
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -104,7 +105,7 @@
                 <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
                     <span style="color:var(--text-secondary); font-size:0.8rem;">vs India National</span>
                     <span style="font-family:'JetBrains Mono'; font-size:0.8rem;
-                                  color:{% if report.vs_national and report.vs_national > 0 %}var(--accent-green){% elif report.vs_national and report.vs_national < 0 %}var(--accent-red){% else %}var(--text-secondary){% endif %};
+                                  color:{% if report.vs_national and report.vs_national > 0 %}var(--accent-green){% elif report.vs_national and report.vs_national < 0 %}var(--accent-red){% else %}var(--text-secondary){% endif %};">
                         {% if report.vs_national %}
                             {% if report.vs_national > 0 %}+{{ report.vs_national }}% better
                             {% else %}{{ report.vs_national }}% worse{% endif %}
@@ -115,7 +116,8 @@
                     {% if report.vs_national %}
                     <div style="height:4px; border-radius:2px;
                                  width:{{ [report.vs_national|abs, 100]|min }}%;
-                                 background:{% if report.vs_national and report.vs_national > 0 %}var(--accent-green){% else %}var(--accent-red){% endif %};</div>
+                                 background:{% if report.vs_national and report.vs_national > 0 %}var(--accent-green){% else %}var(--accent-red){% endif %};">
+                    </div>
                     {% endif %}
                 </div>
             </div>
