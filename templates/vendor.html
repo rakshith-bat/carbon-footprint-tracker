@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}CarbonChain | Vendor Dashboard{% endblock %}
+
+{% block content %}
+<div class="cyber-container">
+
+    <div class="cyber-panel" style="margin-bottom:24px;">
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
+            <h2 style="margin:0;">Energy Vendor</h2>
+            <span style="background:rgba(0,255,157,0.1); border:1px solid var(--accent-green);
+                          color:var(--accent-green); padding:4px 12px; border-radius:4px;
+                          font-family:'JetBrains Mono'; font-size:0.72rem;">
+                ⚡ CERTIFIED VENDOR
+            </span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+            <div style="text-align:center; padding:32px;
+                         background:rgba(255,255,255,0.02); border-radius:4px;">
+                <h3 style="color:var(--accent-green); font-size:2.5rem; margin-bottom:8px;">
+                    {{ balance }}
+                </h3>
+                <p style="color:var(--text-secondary);">GRC Balance</p>
+            </div>
+            <div style="padding:24px; background:rgba(255,255,255,0.02); border-radius:4px;">
+                <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:8px;">
+                    ALGORAND ADDRESS
+                </p>
+                <p style="color:var(--accent-cyan); font-family:'JetBrains Mono';
+                            font-size:0.75rem; word-break:break-all;">
+                    {{ algo_address }}
+                </p>
+                <a href="https://testnet.algoexplorer.io/address/{{ algo_address }}"
+                   target="_blank"
+                   style="color:var(--accent-green); font-size:0.72rem;
+                           margin-top:8px; display:block;">
+                    View on Explorer ↗
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send GRC rebate back to consumer -->
+    <div class="cyber-panel" style="margin-bottom:24px;">
+        <h3 style="margin-bottom:20px;">Send GRC Rebate to Consumer</h3>
+        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
+            Reward consumers who buy your renewable energy by sending GRC back.
+        </p>
+        <form method="POST" action="/transfer">
+            <label>Select Consumer</label>
+            <select name="recipient">
+                {% for u in all_consumers %}
+                <option value="{{ u }}">{{ u }}</option>
+                {% else %}
+                <option disabled>No consumers registered yet</option>
+                {% endfor %}
+            </select>
+            <label>Amount (GRC)</label>
+            <input type="number" name="amount" step="0.01" min="0.01"
+                   placeholder="e.g. 5.00" max="{{ balance }}">
+            <button type="submit" class="cyber-btn"
+                    style="width:100%; margin-top:8px;">
+                SEND GRC REBATE
+            </button>
+        </form>
+    </div>
+
+    <div class="cyber-panel">
+        <h3 style="margin-bottom:16px;">How It Works</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+            <div style="padding:20px; background:rgba(0,255,157,0.03);
+                         border:1px solid rgba(0,255,157,0.1); border-radius:4px;">
+                <p style="color:var(--accent-green); font-family:'JetBrains Mono';
+                            font-size:0.72rem; margin-bottom:8px;">STEP 1</p>
+                <p style="color:var(--text-secondary); font-size:0.85rem;">
+                    Consumer logs renewable energy usage and earns GRC tokens
+                </p>
+            </div>
+            <div style="padding:20px; background:rgba(0,243,255,0.03);
+                         border:1px solid rgba(0,243,255,0.1); border-radius:4px;">
+                <p style="color:var(--accent-cyan); font-family:'JetBrains Mono';
+                            font-size:0.72rem; margin-bottom:8px;">STEP 2</p>
+                <p style="color:var(--text-secondary); font-size:0.85rem;">
+                    Consumer transfers GRC to vendor as payment for clean energy supply
+                </p>
+            </div>
+            <div style="padding:20px; background:rgba(155,0,255,0.03);
+                         border:1px solid rgba(155,0,255,0.2); border-radius:4px;">
+                <p style="color:#9b00ff; font-family:'JetBrains Mono';
+                            font-size:0.72rem; margin-bottom:8px;">STEP 3</p>
+                <p style="color:var(--text-secondary); font-size:0.85rem;">
+                    Vendor sends GRC rebate back — circular token economy on Algorand
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

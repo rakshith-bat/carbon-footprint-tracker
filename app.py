@@ -11,6 +11,7 @@ from analyst.scorer import vs_national, vs_state, get_best_day, get_worst_day, g
 from algo.rewards import send_green_credits, get_user_token_balance
 from algo.ledger import record_emission_on_chain
 from algo.rewards import send_green_credits, get_user_token_balance, fund_new_wallet
+from algo.rewards import send_green_credits, get_user_token_balance, fund_new_wallet, transfer_credits
 
 import os
 import datetime
@@ -228,7 +229,6 @@ def analyst():
         user_state=user_state
     )
 
-
 @app.route('/wallet')
 def wallet():
     if 'user' not in session:
@@ -238,13 +238,14 @@ def wallet():
     user_data = user_manager.get_user(user)
     algo_address = user_data.get('algo_address', '')
     balance = get_user_token_balance(algo_address) if algo_address else 0
+    all_users = [u for u in user_manager.get_all_users() if u != user]
 
     return render_template('wallet.html',
         user=user,
         balance=round(balance, 2),
-        algo_address=algo_address
+        algo_address=algo_address,
+        all_users=all_users
     )
-
 
 @app.route('/leaderboard')
 def leaderboard():
@@ -278,9 +279,10 @@ def login():
         action = request.form.get('action')
         city = request.form.get('city', 'Other')
         monthly_goal = float(request.form.get('monthly_goal', 300) or 300)
+        user_type = request.form.get('user_type', 'consumer')
 
         if action == 'register':
-            success, msg = user_manager.register(username, password, city=city, monthly_goal=monthly_goal)
+            success, msg = user_manager.register(username, password, city=city, monthly_goal=monthly_goal, user_type=user_type)
             if success:
                 u_data = user_manager.get_user(username)
                 algo_address = u_data.get('algo_address', '')
@@ -329,7 +331,61 @@ def ledger():
 def logout():
     session.clear()
     return redirect(url_for('login'))
+@app.route('/transfer', methods=['POST'])
+def transfer():
+    if 'user' not in session:
+        return redirect(url_for('login'))
 
+    sender = session['user']
+    recipient = request.form.get('recipient')
+    try:
+        amount = float(request.form.get('amount'))
+    except:
+        return redirect(url_for('wallet'))
+
+    sender_data = user_manager.get_user(sender)
+    recipient_data = user_manager.get_user(recipient)
+
+    if not recipient_data:
+        return redirect(url_for('wallet'))
+
+    sender_address = sender_data.get('algo_address')
+    sender_key = user_manager.get_algo_private_key(sender)
+    recipient_address = recipient_data.get('algo_address')
+
+    sender_balance = get_user_token_balance(sender_address)
+    if amount > sender_balance:
+        return redirect(url_for('wallet'))
+
+    try:
+        transfer_credits(sender_address, sender_key, recipient_address, amount)
+    except Exception as e:
+        print(f"Transfer failed: {e}")
+
+    return redirect(url_for('wallet'))
+
+
+@app.route('/vendor')
+def vendor():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user = session['user']
+    user_data = user_manager.get_user(user)
+
+    if user_data.get('user_type') != 'vendor':
+        return redirect(url_for('dashboard'))
+
+    algo_address = user_data.get('algo_address', '')
+    balance = get_user_token_balance(algo_address) if algo_address else 0
+
+    return render_template('vendor.html',
+        user=user,
+        balance=round(balance, 2),
+        algo_address=algo_address,
+        all_consumers=[u for u in user_manager.get_all_users()
+                       if user_manager.get_user(u).get('user_type') == 'consumer']
+    )
 
 if __name__ == '__main__':
     import threading

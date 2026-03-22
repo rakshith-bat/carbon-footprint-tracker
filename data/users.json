@@ -18,5 +18,16 @@
         "last_entry_date": "2026-03-22",
         "algo_address": "XYLAVKKLTESTMGMFGIOOF3QSESUR7U44AVKB6BDREZZJJ6IDP6H5MFENQA",
         "algo_mnemonic": "mechanic spy lounge fatigue observe symbol salmon pepper pupil foil occur season clock derive fortune able jar ankle sand humble coffee theme foil absent crowd"
+    },
+    "doss": {
+        "password": "ef4f4a9e6c13449735df956ed826b32046a55cdeacb03a7e3b2c2f20958fb37a",
+        "joined_at": "posix.times_result(user=0.84, system=0.09, children_user=0.0, children_system=0.0, elapsed=4308581.15)",
+        "city": "Tamil Nadu",
+        "monthly_goal": 300.0,
+        "streak": 0,
+        "last_entry_date": null,
+        "algo_address": "YNLP33HVHMXB5KHLIATASF2OCRRFE5LKV7V3JK3ZQM2UJ6A4QC533WIEUY",
+        "algo_mnemonic": "super final tribe palace gate excite sleep pistol turkey junior search child harsh execute tumble spring subway burger army lizard chronic ability silent above list",
+        "user_type": "vendor"
     }
 }

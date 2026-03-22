@@ -144,3 +144,25 @@ def get_user_token_balance(user_address):
         return 0
     except:
         return 0
+def transfer_credits(sender_address, sender_private_key, receiver_address, amount_credits):
+    """Send GRC from one user to another — real on-chain transfer."""
+    client = get_algod_client()
+    asset_id = get_asset_id()
+    if not asset_id:
+        return None
+
+    amount_units = int(amount_credits * 100)
+    params = client.suggested_params()
+
+    txn = AssetTransferTxn(
+        sender=sender_address,
+        sp=params,
+        receiver=receiver_address,
+        amt=amount_units,
+        index=asset_id
+    )
+    signed = txn.sign(sender_private_key)
+    tx_id = client.send_transaction(signed)
+    wait_for_confirmation(client, tx_id, 4)
+    print(f"Transferred {amount_credits} GRC | {sender_address[:8]} → {receiver_address[:8]} | TxID: {tx_id}")
+    return tx_id

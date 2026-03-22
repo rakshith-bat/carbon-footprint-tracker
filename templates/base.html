@@ -14,15 +14,18 @@
                 <span style="font-size:0.5em; color:var(--accent-green); vertical-align:middle;">v3.0</span>
             </h1>
         </div>
-        <div class="nav-links">
+       <div class="nav-links">
             <a href="/index">Tracker</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/analyst">Analyst</a>
             <a href="/wallet">Wallet</a>
             <a href="/ledger">Ledger</a>
             <a href="/leaderboard">Leaderboard</a>
+            {% if session.get('user') %}
+            <a href="/vendor" style="color:#9b00ff;">Vendor</a>
+            {% endif %}
             <a href="/logout" style="color:var(--accent-red);">Logout</a>
-        </div>
+</div>
     </nav>
 
     {% block content %}{% endblock %}

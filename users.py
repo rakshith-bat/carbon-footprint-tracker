@@ -27,7 +27,7 @@ class UserManager:
     def hash_password(self, password):
         return hashlib.sha256(password.encode()).hexdigest()
 
-    def register(self, username, password, city='Other', monthly_goal=300.0):
+    def register(self, username, password, city='Other', monthly_goal=300.0, user_type='consumer'):
         if username in self.users:
             return False, "Username already exists"
         algo_address, algo_mn = generate_user_wallet()
@@ -40,7 +40,8 @@ class UserManager:
             'last_entry_date': None,
             'algo_address':    algo_address,
             'algo_mnemonic':   algo_mn,
-        }
+            'user_type':       user_type,
+            }
         self.save_users()
         return True, "Registration successful"
 
