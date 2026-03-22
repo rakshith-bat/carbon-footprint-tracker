@@ -2,11 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from config import Config
 from users import UserManager
 from emissions import calculate_daily_emissions, calculate_green_credits
-from blockchain import Blockchain
+from analyst.engine import (
+    save_entry, can_submit_today, build_analyst_report,
+    get_user_entries, get_monthly_usage, get_personal_average
+)
+from analyst.narrator import generate_narrative
+from analyst.scorer import vs_national, vs_state, get_best_day, get_worst_day, get_category_breakdown_avg
+from algo.rewards import send_green_credits, get_user_token_balance
+from algo.ledger import record_emission_on_chain
+from algo.rewards import send_green_credits, get_user_token_balance, fund_new_wallet
 
 import os
 import datetime
-import time  # FIXED: Added missing import
 import json
 import traceback
 import sys
@@ -18,12 +25,11 @@ app.config.from_object(Config)
 
 # Initialize Core Systems
 user_manager = UserManager()
-blockchain = Blockchain()
 
 if not os.path.exists(Config.DATA_DIR):
     os.makedirs(Config.DATA_DIR)
 
-# --- AUTHENTICATION HELPERS ---
+# --- AUTHENTICATION HELPERS --- (unchanged)
 def _load_local_key():
     try:
         with open("core/auth_key.txt", "r") as f:
@@ -45,7 +51,6 @@ def _auth_check():
         return False
     return local == remote
 
-# Global Auth Check before every request
 @app.before_request
 def check_auth():
     try:
@@ -54,14 +59,14 @@ def check_auth():
     except:
         pass
 
-
-# Initial startup check
 if not _auth_check():
     sys.exit("AUTH FAILED: Startup check failed.")
 
-print(" APP STARTING: Blockchain Carbon Tracker Active ")
+print(" APP STARTING: Carbon Tracker + Algorand + Analyst Active ")
 
-# --- ROUTES ---
+# ─────────────────────────────────────────────
+# ROUTES
+# ─────────────────────────────────────────────
 
 @app.route('/')
 def root():
@@ -69,141 +74,201 @@ def root():
         return redirect(url_for('index'))
     return redirect(url_for('login'))
 
+
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if 'user' not in session:
         return redirect(url_for('login'))
-    
+
     user = session['user']
-    
+    user_data = user_manager.get_user(user)
+    user_state = user_data.get('city', 'Other')
+    today = datetime.date.today().isoformat()
+
+    # Check daily entry lock
+    can_submit, existing_entry = can_submit_today(user)
+
     if request.method == 'POST':
+        action = request.form.get('action', 'submit')
+
+        # Block second submission unless it's an edit
+        if not can_submit and action != 'edit':
+            return render_template('index.html',
+                user=user,
+                locked=True,
+                existing=existing_entry,
+                balance=get_user_token_balance(user_data.get('algo_address', '')),
+                error="You've already logged today. Use Edit to update.")
+
         try:
             data = request.form.to_dict()
-            
-            # Validation
-            for field in ['ac_hours', 'screen_hours', 'tv_hours', 'lighting_hours']:
-                val = float(data.get(field, 0) or 0)
-                if val < 0 or val > 24:
-                    return render_template('index.html', user=user, error=f"Invalid input: {field} must be 0-24")
+            results = calculate_daily_emissions(data, user_state=user_state)
+            credits = calculate_green_credits(
+                results['net_emissions'],
+                results['renewable_kwh'],
+                results['eco_score']
+            )
 
-            results = calculate_daily_emissions(data)
-            credits = calculate_green_credits(results['net_emissions'], results['renewable_kwh'], results['eco_score'])
-            
-            tx_data = {
-                'inputs': {k: v for k, v in data.items() if v and v != '0'},
-                'net': results['net_emissions'],
-                'score': results['eco_score']
+            # Save to entries.json (local fast store)
+            entry_record = {
+                **results,
+                'credits_earned': credits,
+                'timestamp': today,
+                'inputs': {k: v for k, v in data.items() if v and v != '0'}
             }
-            
-            blockchain.add_transaction(user, 'emission', tx_data)
-            
-            if credits > 0:
-                blockchain.add_transaction(user, 'reward', {'credits': credits, 'reason': 'Eco-Score Reward'})
-            
+            save_entry(user, today, entry_record)
+
+            # Update streak
+            personal_avg = get_personal_average(user)
+            below_avg = personal_avg is None or results['net_emissions'] <= personal_avg
+            streak = user_manager.update_streak(user, today, below_avg)
+
+            # Streak bonus
+            if streak > 0 and streak % Config.STREAK_BONUS_THRESHOLD == 0:
+                credits += Config.STREAK_BONUS_CREDITS
+
+            # Send real Algorand tokens (non-blocking — don't crash if network slow)
+            algo_address = user_data.get('algo_address')
+            if algo_address and credits > 0:
+                try:
+                    send_green_credits(algo_address, credits)
+                except Exception as e:
+                    print(f"Algo reward failed (non-critical): {e}")
+
+            # Record emission on-chain as note
+            try:
+                record_emission_on_chain(user, results['net_emissions'], results['eco_score'])
+            except Exception as e:
+                print(f"Algo ledger write failed (non-critical): {e}")
+
             session['last_results'] = json.loads(json.dumps(results))
             session['last_credits'] = credits
             return redirect(url_for('results'))
-            
+
         except Exception as e:
             traceback.print_exc()
             return render_template('index.html', user=user, error="Calculation error occurred.")
 
-    return render_template('index.html', user=user, balance=round(blockchain.get_user_balance(user), 2))
+    # GET — show form
+    algo_address = user_data.get('algo_address', '')
+    balance = get_user_token_balance(algo_address) if algo_address else 0
+
+    return render_template('index.html',
+        user=user,
+        locked=not can_submit,
+        existing=existing_entry,
+        balance=round(balance, 2),
+        streak=user_data.get('streak', 0),
+        user_state=user_state
+    )
+
 
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session:
         return redirect(url_for('login'))
-    
-    user = session['user']
-    balance = blockchain.get_user_balance(user)
-    
-    total_emissions = 0
-    tx_count = 0
-    recent_txs = []
-    
-    # Process blocks to calculate user specific stats
-    for block in reversed(blockchain.chain):
-        block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
-        transactions = block_dict.get('transactions', [])
-        
-        for tx in transactions:
-            if tx.get('user') == user:
-                tx_count += 1
-                
-                # Check for both internal naming variants
-                if tx.get('type') in ['emission', 'carbon_emission']:
-                    total_emissions += tx.get('data', {}).get('net', 0)
-                
-                if len(recent_txs) < 5:
-                    # FIXED: time.time() now works because of the import above
-                    ts_val = tx.get('timestamp') or block_dict.get('timestamp') or time.time()
-                    ts = datetime.datetime.fromtimestamp(ts_val).strftime('%Y-%m-%d %H:%M')
-                    recent_txs.append({
-                        'timestamp': ts,
-                        'summary': blockchain.generate_readable_summary(block)
-                    })
-                
-    return render_template('dashboard.html', 
-                         user=user, 
-                         balance=round(balance, 2), 
-                         total_emissions=round(total_emissions, 2),
-                         transaction_count=tx_count,
-                         recent_transactions=recent_txs)
 
-@app.route('/wallet', methods=['GET', 'POST'])
+    user = session['user']
+    user_data = user_manager.get_user(user)
+    algo_address = user_data.get('algo_address', '')
+
+    balance = get_user_token_balance(algo_address) if algo_address else 0
+    monthly_used = get_monthly_usage(user)
+    monthly_goal = user_data.get('monthly_goal', 300)
+    personal_avg = get_personal_average(user)
+
+    entries = get_user_entries(user)
+    recent = list(reversed(list(entries.items())))[:5]
+    recent_txs = [
+        {'timestamp': d, 'net': e.get('net_emissions', 0), 'score': e.get('eco_score', 0)}
+        for d, e in recent
+    ]
+
+    return render_template('dashboard.html',
+        user=user,
+        balance=round(balance, 2),
+        monthly_used=round(monthly_used, 2),
+        monthly_goal=monthly_goal,
+        personal_avg=personal_avg,
+        total_entries=len(entries),
+        recent_transactions=recent_txs,
+        streak=user_data.get('streak', 0),
+        algo_address=algo_address
+    )
+
+
+@app.route('/analyst')
+def analyst():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user = session['user']
+    user_data = user_manager.get_user(user)
+    user_state = user_data.get('city', 'Other')
+    monthly_goal = user_data.get('monthly_goal', 300)
+    all_users = user_manager.get_all_users()
+
+    # Build full report
+    report = build_analyst_report(user, user_state, all_users, monthly_goal)
+
+    # Scorer extras
+    report['vs_national'] = vs_national(report['personal_avg'])
+    report['vs_state'] = vs_state(report['personal_avg'], user_state)
+    report['best_day'], report['best_val'] = get_best_day(user)
+    report['worst_day'], report['worst_val'] = get_worst_day(user)
+    report['category_avgs'] = get_category_breakdown_avg(user)
+
+    # AI narrative (Claude API or fallback)
+    narrative = generate_narrative(report, user_state)
+
+    return render_template('analyst.html',
+        user=user,
+        report=report,
+        narrative=narrative,
+        user_state=user_state
+    )
+
+
+@app.route('/wallet')
 def wallet():
     if 'user' not in session:
         return redirect(url_for('login'))
-    
-    user = session['user']
-    balance = blockchain.get_user_balance(user)
-    all_users = [u for u in user_manager.get_all_users() if u != user]
-    
-    if request.method == 'POST':
-        recipient = request.form.get('recipient')
-        try:
-            amount = float(request.form.get('amount'))
-            if amount > balance:
-                return render_template('wallet.html', user=user, balance=round(balance, 2), users=all_users, error="Insufficient funds")
-            
-            blockchain.add_transaction(user, 'exchange', {'recipient': recipient, 'amount': amount})
-            return redirect(url_for('wallet'))
-        except ValueError:
-            return render_template('wallet.html', user=user, balance=round(balance, 2), users=all_users, error="Invalid amount")
 
-    return render_template('wallet.html', user=user, balance=round(balance, 2), users=all_users)
+    user = session['user']
+    user_data = user_manager.get_user(user)
+    algo_address = user_data.get('algo_address', '')
+    balance = get_user_token_balance(algo_address) if algo_address else 0
+
+    return render_template('wallet.html',
+        user=user,
+        balance=round(balance, 2),
+        algo_address=algo_address
+    )
+
 
 @app.route('/leaderboard')
 def leaderboard():
     users = user_manager.get_all_users()
     stats = []
-    
+
     for u in users:
-        bal = blockchain.get_user_balance(u)
-        total_emissions = 0
-        eco_score_sum = 0
-        count = 0
-        
-        for block in blockchain.chain:
-            block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
-            transactions = block_dict.get('transactions', [])
-            for tx in transactions:
-                if tx.get('user') == u and tx.get('type') in ['emission', 'carbon_emission']:
-                    total_emissions += tx.get('data', {}).get('net', 0)
-                    eco_score_sum += tx.get('data', {}).get('score', 0)
-                    count += 1
-        
-        avg_score = round(eco_score_sum / count) if count > 0 else 0
+        u_data = user_manager.get_user(u)
+        algo_address = u_data.get('algo_address', '')
+        balance = get_user_token_balance(algo_address) if algo_address else 0
+        avg = get_personal_average(u)
+        monthly = get_monthly_usage(u)
+
         stats.append({
             'username': u,
-            'balance': round(bal, 2),
-            'total_emissions': round(total_emissions, 2),
-            'avg_score': avg_score
+            'balance': round(balance, 2),
+            'avg_daily': avg or 0,
+            'monthly_used': round(monthly, 2),
+            'streak': u_data.get('streak', 0)
         })
-    
+
     stats.sort(key=lambda x: x['balance'], reverse=True)
     return render_template('leaderboard.html', stats=stats)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -211,14 +276,22 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         action = request.form.get('action')
+        city = request.form.get('city', 'Other')
+        monthly_goal = float(request.form.get('monthly_goal', 300) or 300)
 
         if action == 'register':
-            success, msg = user_manager.register(username, password)
+            success, msg = user_manager.register(username, password, city=city, monthly_goal=monthly_goal)
             if success:
-                blockchain.add_transaction(username, 'reward', {'credits': 10, 'reason': 'Welcome Bonus'})
+                u_data = user_manager.get_user(username)
+                algo_address = u_data.get('algo_address', '')
+                try:
+                    fund_new_wallet(algo_address)      # 0.5 ALGO first
+                    send_green_credits(algo_address, 10.0)   # then welcome tokens
+                except Exception as e:
+                    print(f"Welcome bonus failed (non-critical): {e}")
                 return render_template('login.html', message="Registered! Please login.")
             return render_template('login.html', error=msg)
-        
+
         elif action == 'login':
             if user_manager.login(username, password):
                 session['user'] = username
@@ -227,39 +300,48 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/results')
 def results():
     if 'user' not in session or 'last_results' not in session:
         return redirect(url_for('index'))
     res = session['last_results']
     status = 'green' if res['eco_score'] >= 70 else 'yellow' if res['eco_score'] >= 40 else 'red'
-    return render_template('results.html', results=res, credits=session.get('last_credits', 0), status=status)
+    return render_template('results.html',
+        results=res,
+        credits=session.get('last_credits', 0),
+        status=status
+    )
+
 
 @app.route('/ledger')
 def ledger():
-    display_chain = []
-    for block in blockchain.chain:
-        block_dict = block.to_dict() if hasattr(block, 'to_dict') else block
-        b = block_dict.copy()
-        b['timestamp'] = datetime.datetime.fromtimestamp(block_dict['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
-        display_chain.append(b)
-    return render_template('ledger.html', chain=display_chain)
+    user = session.get('user', 'anonymous')
+    entries = get_user_entries(user)
+    display = [
+        {'date': d, 'net': e.get('net_emissions'), 'score': e.get('eco_score'), 'credits': e.get('credits_earned')}
+        for d, e in reversed(list(entries.items()))
+    ]
+    return render_template('ledger.html', entries=display)
+
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
 
+
 if __name__ == '__main__':
     import threading
 
     def run_3000():
-        app.run(host="0.0.0.0",debug=True, port=3000, use_reloader=False)
+        app.run(host="0.0.0.0", debug=True, port=3000, use_reloader=False)
 
     def run_5000():
-        app.run(host="0.0.0.0",debug=True, port=5000, use_reloader=False)
+        app.run(host="0.0.0.0", debug=True, port=5000, use_reloader=False)
+
     def run_666():
-        app.run(host="0.0.0.0",debug=True, port=666, use_reloader=False)
+        app.run(host="0.0.0.0", debug=True, port=666, use_reloader=False)
 
     t1 = threading.Thread(target=run_3000)
     t2 = threading.Thread(target=run_5000)

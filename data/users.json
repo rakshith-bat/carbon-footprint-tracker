@@ -14,5 +14,15 @@
     "abc": {
         "password": "36bbe50ed96841d10443bcb670d6554f0a34b761be67ec9c4a8ad2c0c44ca42c",
         "joined_at": "posix.times_result(user=3.2, system=7.64, children_user=0.0, children_system=0.0, elapsed=4296960.69)"
+    },
+    "sss11": {
+        "password": "f15e04c8588bb5c5e8b697bdb6a98100dec6800a5b586df85de42477e2a13439",
+        "joined_at": "posix.times_result(user=0.97, system=0.18, children_user=0.0, children_system=0.0, elapsed=4300999.22)",
+        "city": "Other",
+        "monthly_goal": 300.0,
+        "streak": 0,
+        "last_entry_date": null,
+        "algo_address": "AKSWUKE74LZUFMXD4W55ERXVYQ3IYOJX4TKNKVAXRSFJIRWM6PCH23BMWU",
+        "algo_mnemonic": "viable retire pudding photo session join crime shadow lawn arctic piece hazard curtain twice uncover any gold someone phrase wage riot travel puppy able blast"
     }
 }

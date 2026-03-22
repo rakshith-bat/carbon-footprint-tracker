@@ -1,3 +1,5 @@
 Flask==2.3.2
-stable internet coneection
-port 3000 or 5000 available
+py-algorand-sdk
+python-dotenv
+requests
+anthropic
