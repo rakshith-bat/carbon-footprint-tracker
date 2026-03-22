@@ -1,0 +1,270 @@
+{
+  "boss": {
+    "2026-03-08": {
+      "net_emissions": 8.2,
+      "gross_emissions": 9.399999999999999,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 72,
+      "credits_earned": 3.5,
+      "timestamp": "2026-03-08",
+      "breakdown": {
+        "transport": 3.28,
+        "electricity": 2.87,
+        "food": 1.64,
+        "waste": 0.41
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-09": {
+      "net_emissions": 11.4,
+      "gross_emissions": 12.6,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 45,
+      "credits_earned": 1.0,
+      "timestamp": "2026-03-09",
+      "breakdown": {
+        "transport": 4.56,
+        "electricity": 3.99,
+        "food": 2.28,
+        "waste": 0.57
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-10": {
+      "net_emissions": 6.1,
+      "gross_emissions": 7.3,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 85,
+      "credits_earned": 5.2,
+      "timestamp": "2026-03-10",
+      "breakdown": {
+        "transport": 2.44,
+        "electricity": 2.13,
+        "food": 1.22,
+        "waste": 0.3
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-11": {
+      "net_emissions": 9.8,
+      "gross_emissions": 11.0,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 58,
+      "credits_earned": 2.1,
+      "timestamp": "2026-03-11",
+      "breakdown": {
+        "transport": 3.92,
+        "electricity": 3.43,
+        "food": 1.96,
+        "waste": 0.49
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-12": {
+      "net_emissions": 7.3,
+      "gross_emissions": 8.5,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 78,
+      "credits_earned": 4.0,
+      "timestamp": "2026-03-12",
+      "breakdown": {
+        "transport": 2.92,
+        "electricity": 2.55,
+        "food": 1.46,
+        "waste": 0.36
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-13": {
+      "net_emissions": 13.2,
+      "gross_emissions": 14.399999999999999,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 32,
+      "credits_earned": 0.5,
+      "timestamp": "2026-03-13",
+      "breakdown": {
+        "transport": 5.28,
+        "electricity": 4.62,
+        "food": 2.64,
+        "waste": 0.66
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-14": {
+      "net_emissions": 5.9,
+      "gross_emissions": 7.1000000000000005,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 88,
+      "credits_earned": 6.1,
+      "timestamp": "2026-03-14",
+      "breakdown": {
+        "transport": 2.36,
+        "electricity": 2.06,
+        "food": 1.18,
+        "waste": 0.3
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-15": {
+      "net_emissions": 8.7,
+      "gross_emissions": 9.899999999999999,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 65,
+      "credits_earned": 3.2,
+      "timestamp": "2026-03-15",
+      "breakdown": {
+        "transport": 3.48,
+        "electricity": 3.04,
+        "food": 1.74,
+        "waste": 0.43
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-16": {
+      "net_emissions": 10.1,
+      "gross_emissions": 11.299999999999999,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 52,
+      "credits_earned": 1.8,
+      "timestamp": "2026-03-16",
+      "breakdown": {
+        "transport": 4.04,
+        "electricity": 3.53,
+        "food": 2.02,
+        "waste": 0.51
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-17": {
+      "net_emissions": 6.8,
+      "gross_emissions": 8.0,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 80,
+      "credits_earned": 4.5,
+      "timestamp": "2026-03-17",
+      "breakdown": {
+        "transport": 2.72,
+        "electricity": 2.38,
+        "food": 1.36,
+        "waste": 0.34
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-18": {
+      "net_emissions": 9.2,
+      "gross_emissions": 10.399999999999999,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 61,
+      "credits_earned": 2.8,
+      "timestamp": "2026-03-18",
+      "breakdown": {
+        "transport": 3.68,
+        "electricity": 3.22,
+        "food": 1.84,
+        "waste": 0.46
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-19": {
+      "net_emissions": 7.1,
+      "gross_emissions": 8.299999999999999,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 76,
+      "credits_earned": 3.9,
+      "timestamp": "2026-03-19",
+      "breakdown": {
+        "transport": 2.84,
+        "electricity": 2.48,
+        "food": 1.42,
+        "waste": 0.35
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-20": {
+      "net_emissions": 11.8,
+      "gross_emissions": 13.0,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 41,
+      "credits_earned": 0.8,
+      "timestamp": "2026-03-20",
+      "breakdown": {
+        "transport": 4.72,
+        "electricity": 4.13,
+        "food": 2.36,
+        "waste": 0.59
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    },
+    "2026-03-21": {
+      "net_emissions": 6.4,
+      "gross_emissions": 7.6000000000000005,
+      "renewable_offset": 1.2,
+      "renewable_kwh": 1.5,
+      "eco_score": 83,
+      "credits_earned": 5.0,
+      "timestamp": "2026-03-21",
+      "breakdown": {
+        "transport": 2.56,
+        "electricity": 2.24,
+        "food": 1.28,
+        "waste": 0.32
+      },
+      "inputs": {
+        "transport_type": "metro",
+        "distance": "10"
+      }
+    }
+  }
+}

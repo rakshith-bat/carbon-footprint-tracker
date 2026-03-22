@@ -1,51 +1,108 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CarbonChain | Login</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="cyber-container" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-        <div class="cyber-panel" style="width: 100%; max-width: 420px; padding: 40px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="font-size: 1.8rem; margin-bottom: 10px;">CarbonChain<span style="color: var(--accent-green);">_ID</span></h1>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">Secure Blockchain Access</p>
-            </div>
-            
-            {% if error %}
-            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9rem;">
-                {{ error }}
-            </div>
-            {% endif %}
-            
-            {% if message %}
-            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9rem;">
-                {{ message }}
-            </div>
-            {% endif %}
+{% extends "base.html" %}
+{% block title %}CarbonChain | Login{% endblock %}
 
-            <form method="POST">
-                <div style="margin-bottom: 20px;">
-                    <label>User Handle</label>
-                    <input type="text" name="username" required placeholder="Enter username..." style="margin-bottom: 0;">
-                </div>
-                <div style="margin-bottom: 30px;">
-                    <label>Access Key</label>
-                    <input type="password" name="password" required placeholder="Enter password..." style="margin-bottom: 0;">
-                </div>
-                
-                <div style="display: flex; gap: 16px;">
-                    <button type="submit" name="action" value="login" class="cyber-btn" style="flex: 1;">Login</button>
-                    <button type="submit" name="action" value="register" class="cyber-btn" style="flex: 1; background: transparent; border-color: var(--text-secondary); color: var(--text-secondary);">Register</button>
-                </div>
-            </form>
-            
-            <div style="margin-top: 30px; font-size: 0.75rem; color: var(--text-secondary); text-align: center; font-family: 'JetBrains Mono'; opacity: 0.6;">
-                SECURE CONNECTION // SHA-256 ENCRYPTED
+{% block content %}
+<div class="cyber-container" style="display:flex; justify-content:center;
+                                     align-items:center; min-height:80vh;">
+    <div class="cyber-panel" style="width:100%; max-width:440px; padding:40px;">
+
+        <div style="text-align:center; margin-bottom:30px;">
+            <h1 style="font-size:1.8rem; margin-bottom:10px;">
+                CarbonChain<span style="color:var(--accent-green);">_ID</span>
+            </h1>
+            <p style="color:var(--text-secondary); font-size:0.9rem;">
+                Secure Algorand-Backed Access
+            </p>
+        </div>
+
+        {% if error %}
+        <div style="background:rgba(239,68,68,0.1); border:1px solid var(--accent-red);
+                     color:var(--accent-red); padding:12px; border-radius:4px;
+                     margin-bottom:20px; text-align:center; font-size:0.9rem;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if message %}
+        <div style="background:rgba(16,185,129,0.1); border:1px solid var(--accent-green);
+                     color:var(--accent-green); padding:12px; border-radius:4px;
+                     margin-bottom:20px; text-align:center; font-size:0.9rem;">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <label>User Handle</label>
+            <input type="text" name="username" required placeholder="Enter username...">
+
+            <label>Access Key</label>
+            <input type="password" name="password" required placeholder="Enter password...">
+
+            <!-- Registration extras — hidden until register is clicked -->
+            <div id="reg-fields" style="display:none;">
+                <label>State / Region</label>
+                <select name="city">
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Other">Other</option>
+                </select>
+                <label>Monthly CO2 Goal (kg)</label>
+                <input type="number" name="monthly_goal" placeholder="e.g. 250" value="300" min="50" max="1000">
+                <p style="color:var(--text-secondary); font-size:0.72rem; margin-top:-4px; margin-bottom:12px;">
+                    India avg ~255 kg/month. Ambitious: 150. Easy start: 300.
+                </p>
             </div>
+
+            <div style="display:flex; gap:16px; margin-top:8px;">
+                <button type="submit" name="action" value="login"
+                        class="cyber-btn" style="flex:1;">
+                    LOGIN
+                </button>
+                <button type="submit" name="action" value="register"
+                        id="reg-btn"
+                        class="cyber-btn"
+                        style="flex:1; border-color:var(--text-secondary);
+                               color:var(--text-secondary);">
+                    REGISTER
+                </button>
+            </div>
+        </form>
+
+        <div style="margin-top:30px; font-size:0.72rem; color:var(--text-secondary);
+                     text-align:center; font-family:'JetBrains Mono'; opacity:0.6;">
+            ALGORAND TESTNET // SHA-256 // REAL TOKENS
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Show extra registration fields when register button is clicked
+const regBtn = document.getElementById('reg-btn');
+const regFields = document.getElementById('reg-fields');
+let regMode = false;
+
+regBtn.addEventListener('click', (e) => {
+    if (!regMode) {
+        e.preventDefault();
+        regMode = true;
+        regFields.style.display = 'block';
+        regBtn.style.borderColor = 'var(--accent-green)';
+        regBtn.style.color = 'var(--accent-green)';
+        regBtn.innerText = 'CONFIRM REGISTER';
+    }
+    // second click submits normally
+});
+</script>
+{% endblock %}

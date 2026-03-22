@@ -8,5 +8,15 @@
         "last_entry_date": null,
         "algo_address": "TDQCW62UFJ6FKI7FOHPXZRMOMWRKE5EDE375CTYFXKNQVLH426RT32GJSE",
         "algo_mnemonic": "morning equal truly power half surprise idle escape damp scene divide cave cool health angry maze city royal right heart fade asthma aunt able select"
+    },
+    "boss": {
+        "password": "a5e7c002443743c5836758c7d1cd8ddefd9fcf2061daa0efaac683fb99966057",
+        "joined_at": "posix.times_result(user=1.22, system=0.12, children_user=0.0, children_system=0.0, elapsed=4304308.67)",
+        "city": "Karnataka",
+        "monthly_goal": 300.0,
+        "streak": 1,
+        "last_entry_date": "2026-03-22",
+        "algo_address": "XYLAVKKLTESTMGMFGIOOF3QSESUR7U44AVKB6BDREZZJJ6IDP6H5MFENQA",
+        "algo_mnemonic": "mechanic spy lounge fatigue observe symbol salmon pepper pupil foil occur season clock derive fortune able jar ankle sand humble coffee theme foil absent crowd"
     }
 }

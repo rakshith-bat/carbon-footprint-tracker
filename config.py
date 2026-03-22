@@ -16,7 +16,7 @@ class Config:
     # ── Algorand ──────────────────────────────────────
     ALGO_TREASURY_MNEMONIC = os.getenv("ALGO_TREASURY_MNEMONIC")
     ALGO_TREASURY_ADDRESS  = os.getenv("ALGO_TREASURY_ADDRESS")
-    ANTHROPIC_API_KEY      = os.getenv("ANTHROPIC_API_KEY", "")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
     # ── App behaviour ─────────────────────────────────
     DAILY_ENTRY_LIMIT       = 1

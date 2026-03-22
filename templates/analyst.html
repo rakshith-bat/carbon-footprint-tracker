@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% block title %}CarbonChain | Analyst{% endblock %}
+
+{% block content %}
+<div class="cyber-container">
+
+    {% if report.entry_count == 0 %}
+    <!-- No data yet -->
+    <div style="display:flex; justify-content:center; align-items:center; min-height:70vh;">
+        <div class="cyber-panel" style="text-align:center; max-width:480px; padding:48px;">
+            <h2 style="color:var(--accent-cyan);">No Data Yet</h2>
+            <p style="color:var(--text-secondary); margin-top:16px;">
+                Log at least one day to unlock your analysis.
+            </p>
+            <a href="/index" class="cyber-btn"
+               style="display:inline-block; margin-top:24px; text-decoration:none;">
+                LOG TODAY
+            </a>
+        </div>
+    </div>
+
+    {% else %}
+
+    <!-- ── AI Narrative ── -->
+    <div class="cyber-panel" style="border-color:rgba(0,243,255,0.3); margin-bottom:24px;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <span style="color:var(--accent-cyan); font-family:'JetBrains Mono';
+                          font-size:0.72rem; letter-spacing:0.15em;">◎ ANALYST AI</span>
+            <span style="height:1px; flex:1; background:rgba(0,243,255,0.2);"></span>
+            <span style="color:var(--text-secondary); font-size:0.72rem;
+                          font-family:'JetBrains Mono';">{{ user_state }}</span>
+        </div>
+        <p style="color:var(--text-primary); line-height:1.8; font-size:0.95rem;">
+            {{ narrative }}
+        </p>
+    </div>
+
+    <!-- ── Key Numbers ── -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;">
+
+        <div class="cyber-panel" style="text-align:center; padding:24px;">
+            <p style="color:var(--text-secondary); font-size:0.72rem; margin-bottom:8px;">TODAY</p>
+            <h3 style="font-size:2rem; color:{% if report.today_net and report.personal_avg and report.today_net < report.personal_avg %}var(--accent-green){% elif report.today_net %}var(--accent-red){% else %}var(--text-secondary){% endif %};"></h3>
+                {{ report.today_net or '—' }}
+            </h3>
+            <p style="color:var(--text-secondary); font-size:0.72rem;">kg CO2</p>
+        </div>
+
+        <div class="cyber-panel" style="text-align:center; padding:24px;">
+            <p style="color:var(--text-secondary); font-size:0.72rem; margin-bottom:8px;">YOUR AVG</p>
+            <h3 style="font-size:2rem; color:var(--accent-cyan);">
+                {{ report.personal_avg or '—' }}
+            </h3>
+            <p style="color:var(--text-secondary); font-size:0.72rem;">kg / day</p>
+        </div>
+
+        <div class="cyber-panel" style="text-align:center; padding:24px;">
+            <p style="color:var(--text-secondary); font-size:0.72rem; margin-bottom:8px;">{{ user_state|upper }}</p>
+            <h3 style="font-size:2rem; color:var(--text-primary);">
+                {{ report.state_baseline }}
+            </h3>
+            <p style="color:var(--text-secondary); font-size:0.72rem;">kg / day avg</p>
+        </div>
+
+        <div class="cyber-panel" style="text-align:center; padding:24px;">
+            <p style="color:var(--text-secondary); font-size:0.72rem; margin-bottom:8px;">NATIONAL</p>
+            <h3 style="font-size:2rem; color:var(--text-primary);">
+                {{ report.national_avg }}
+            </h3>
+            <p style="color:var(--text-secondary); font-size:0.72rem;">kg / day avg</p>
+        </div>
+
+    </div>
+
+    <!-- ── Comparisons + Trend ── -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
+
+        <div class="cyber-panel">
+            <h3 style="margin-bottom:20px;">How You Compare</h3>
+
+            <!-- vs state -->
+            <div style="margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="color:var(--text-secondary); font-size:0.8rem;">vs {{ user_state }}</span>
+                    <span style="font-family:'JetBrains Mono'; font-size:0.8rem;
+                                  color:{% if report.vs_state and report.vs_state > 0 %}var(--accent-green){% elif report.vs_state and report.vs_state < 0 %}var(--accent-red){% else %}var(--text-secondary){% endif %};
+                        {% if report.vs_state %}
+                            {% if report.vs_state > 0 %}+{{ report.vs_state }}% better
+                            {% else %}{{ report.vs_state }}% worse{% endif %}
+                        {% else %}—{% endif %}
+                    </span>
+                </div>
+                <div style="background:rgba(255,255,255,0.05); border-radius:2px; height:4px;">
+                    {% if report.vs_state %}
+                    <div style="height:4px; border-radius:2px;
+                                 width:{{ [report.vs_state|abs, 100]|min }}%;
+                                 background:{% if report.vs_state and report.vs_state > 0 %}var(--accent-green){% else %}var(--accent-red){% endif %};</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- vs national -->
+            <div style="margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span style="color:var(--text-secondary); font-size:0.8rem;">vs India National</span>
+                    <span style="font-family:'JetBrains Mono'; font-size:0.8rem;
+                                  color:{% if report.vs_national and report.vs_national > 0 %}var(--accent-green){% elif report.vs_national and report.vs_national < 0 %}var(--accent-red){% else %}var(--text-secondary){% endif %};
+                        {% if report.vs_national %}
+                            {% if report.vs_national > 0 %}+{{ report.vs_national }}% better
+                            {% else %}{{ report.vs_national }}% worse{% endif %}
+                        {% else %}—{% endif %}
+                    </span>
+                </div>
+                <div style="background:rgba(255,255,255,0.05); border-radius:2px; height:4px;">
+                    {% if report.vs_national %}
+                    <div style="height:4px; border-radius:2px;
+                                 width:{{ [report.vs_national|abs, 100]|min }}%;
+                                 background:{% if report.vs_national and report.vs_national > 0 %}var(--accent-green){% else %}var(--accent-red){% endif %};</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- peer rank -->
+            <div style="background:rgba(255,255,255,0.03); padding:16px; border-radius:4px;">
+                <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:4px;">PEER RANK</p>
+                {% if report.rank %}
+                <p style="font-family:'JetBrains Mono'; font-size:1.2rem; color:var(--accent-cyan);">
+                    #{{ report.rank }} of {{ report.total_users }} users
+                </p>
+                {% else %}
+                <p style="color:var(--text-secondary); font-size:0.85rem;">Not enough data</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="cyber-panel">
+            <h3 style="margin-bottom:20px;">Trend & Streak</h3>
+
+            <!-- trend -->
+            <div style="background:rgba(255,255,255,0.03); padding:20px;
+                         border-radius:4px; margin-bottom:16px; text-align:center;">
+                <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:8px;">7-DAY TREND</p>
+                <p style="font-size:1.8rem; font-family:'JetBrains Mono';
+                            color:{% if report.trend == 'improving' %}var(--accent-green)
+                                   {% elif report.trend == 'worsening' %}var(--accent-red)
+                                   {% else %}var(--accent-cyan){% endif %};">
+                    {% if report.trend == 'improving' %}↓ IMPROVING
+                    {% elif report.trend == 'worsening' %}↑ WORSENING
+                    {% else %}→ STABLE{% endif %}
+                </p>
+            </div>
+
+            <!-- streak -->
+            <div style="background:rgba(255,255,255,0.03); padding:20px;
+                         border-radius:4px; margin-bottom:16px; text-align:center;">
+                <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:8px;">CURRENT STREAK</p>
+                <p style="font-size:2rem; color:var(--accent-green); font-family:'JetBrains Mono';">
+                    🔥 {{ report.streak }} days
+                </p>
+                {% if report.streak >= 7 %}
+                <p style="color:var(--accent-green); font-size:0.75rem; margin-top:4px;">
+                    Streak bonus active — +2.0 GRC
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- anomaly -->
+            {% if report.anomaly_today %}
+            <div style="background:rgba(239,68,68,0.08); border:1px solid var(--accent-red);
+                         padding:16px; border-radius:4px; text-align:center;">
+                <p style="color:var(--accent-red); font-size:0.82rem; font-family:'JetBrains Mono';">
+                    ⚠ TODAY'S EMISSION IS UNUSUALLY HIGH
+                </p>
+                <p style="color:var(--text-secondary); font-size:0.75rem; margin-top:4px;">
+                    More than 2× your personal average
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- ── Monthly Goal ── -->
+    <div class="cyber-panel" style="margin-bottom:24px;">
+        <h3 style="margin-bottom:20px;">Monthly Goal</h3>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span style="color:var(--text-secondary); font-size:0.82rem;">
+                {{ report.monthly_used }} kg used
+            </span>
+            <span style="color:var(--text-secondary); font-size:0.82rem;">
+                {{ report.monthly_goal }} kg goal —
+                {{ report.days_left_in_month }} days left
+            </span>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); border-radius:2px; height:8px;">
+            {% set pct = [(report.monthly_used / report.monthly_goal * 100)|int, 100]|min %}
+            <div style="height:8px; border-radius:2px; width:{{ pct }}%;
+                         background:{% if pct > 85 %}var(--accent-red)
+                                     {% elif pct > 60 %}#f59e0b
+                                     {% else %}var(--accent-green){% endif %};
+                         transition:width 0.5s ease;"></div>
+        </div>
+        <p style="margin-top:12px; font-family:'JetBrains Mono'; font-size:0.82rem;
+                   color:{% if report.on_track == true %}var(--accent-green){% elif report.on_track == false %}var(--accent-red){% else %}var(--text-secondary){% endif %};">
+            {% if report.on_track %}
+                ✓ On track to meet your goal
+            {% elif report.on_track == False %}
+                ✗ At current pace you'll exceed your goal
+            {% else %}
+                — Not enough data to project
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- ── Category Breakdown ── -->
+    {% if report.category_avgs %}
+    <div class="cyber-panel">
+        <h3 style="margin-bottom:20px;">Average Emission by Category</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:16px;">
+            {% for cat, val in report.category_avgs.items() %}
+            <div style="background:rgba(255,255,255,0.03); padding:16px;
+                         border-radius:4px; text-align:center;">
+                <p style="color:var(--text-secondary); font-size:0.72rem;
+                            text-transform:uppercase; margin-bottom:8px;">{{ cat }}</p>
+                <p style="font-family:'JetBrains Mono'; font-size:1.3rem;
+                            color:{% if val > 5 %}var(--accent-red)
+                                   {% elif val > 2 %}#f59e0b
+                                   {% else %}var(--accent-green){% endif %};">
+                    {{ val }} kg
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Best / Worst ── -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px;">
+        <div class="cyber-panel" style="text-align:center;">
+            <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:8px;">BEST DAY</p>
+            <p style="font-family:'JetBrains Mono'; color:var(--accent-green); font-size:1.1rem;">
+                {{ report.best_day or '—' }}
+            </p>
+            {% if report.best_val is not none %}
+            <p style="color:var(--accent-green); font-size:1.5rem; margin-top:4px;">
+                {{ report.best_val }} kg
+            </p>
+            {% endif %}
+        </div>
+        <div class="cyber-panel" style="text-align:center;">
+            <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:8px;">WORST DAY</p>
+            <p style="font-family:'JetBrains Mono'; color:var(--accent-red); font-size:1.1rem;">
+                {{ report.worst_day or '—' }}
+            </p>
+            {% if report.worst_val is not none %}
+            <p style="color:var(--accent-red); font-size:1.5rem; margin-top:4px;">
+                {{ report.worst_val }} kg
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+{% endblock %}

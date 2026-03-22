@@ -1,59 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CarbonChain | Dashboard</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <nav class="nav-bar">
-        <div class="logo">
-            <h1 style="margin: 0; font-size: 1.5rem;">CARBON_CHAIN <span style="font-size: 0.5em; color: var(--accent-green); vertical-align: middle;">v2.0</span></h1>
-        </div>
-        <div class="nav-links">
-            <a href="/index">Tracker</a>
-            <a href="/dashboard" class="active">Dashboard</a>
-            <a href="/wallet">Wallet</a>
-            <a href="/ledger">Ledger</a>
-            <a href="/leaderboard">Leaderboard</a>
-            <a href="/logout" style="color: var(--accent-red);">Logout</a>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block title %}CarbonChain | Dashboard{% endblock %}
 
-    <div class="cyber-container">
-        <div class="cyber-panel">
-            <h2>User Statistics</h2>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 24px;">
-                <div style="text-align: center; padding: 32px; background: rgba(255,255,255,0.02); border-radius: 12px;">
-                    <h3 style="color: var(--accent-green); font-size: 2.5rem; margin-bottom: 0.5rem;">{{ balance }}</h3>
-                    <p style="color: var(--text-secondary);">Current Credits</p>
-                </div>
-                <div style="text-align: center; padding: 32px; background: rgba(255,255,255,0.02); border-radius: 12px;">
-                    <h3 style="color: var(--accent-red); font-size: 2.5rem; margin-bottom: 0.5rem;">{{ total_emissions }} <span style="font-size: 1rem;">kg</span></h3>
-                    <p style="color: var(--text-secondary);">Total Emissions</p>
-                </div>
-                <div style="text-align: center; padding: 32px; background: rgba(255,255,255,0.02); border-radius: 12px;">
-                    <h3 style="color: var(--accent-cyan); font-size: 2.5rem; margin-bottom: 0.5rem;">{{ transaction_count }}</h3>
-                    <p style="color: var(--text-secondary);">Total Transactions</p>
-                </div>
+{% block content %}
+<div class="cyber-container">
+
+    <div class="cyber-panel">
+        <h2>User Statistics</h2>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:24px;">
+            <div style="text-align:center; padding:32px; background:rgba(255,255,255,0.02); border-radius:4px;">
+                <h3 style="color:var(--accent-green); font-size:2.5rem; margin-bottom:0.5rem;">{{ balance }}</h3>
+                <p style="color:var(--text-secondary);">GRC Balance</p>
+            </div>
+            <div style="text-align:center; padding:32px; background:rgba(255,255,255,0.02); border-radius:4px;">
+                <h3 style="color:var(--accent-red); font-size:2.5rem; margin-bottom:0.5rem;">{{ monthly_used }}<span style="font-size:1rem;">kg</span></h3>
+                <p style="color:var(--text-secondary);">This Month</p>
+            </div>
+            <div style="text-align:center; padding:32px; background:rgba(255,255,255,0.02); border-radius:4px;">
+                <h3 style="color:var(--accent-cyan); font-size:2.5rem; margin-bottom:0.5rem;">{{ personal_avg or '—' }}</h3>
+                <p style="color:var(--text-secondary);">Daily Avg (kg)</p>
+            </div>
+            <div style="text-align:center; padding:32px; background:rgba(255,255,255,0.02); border-radius:4px;">
+                <h3 style="color:var(--accent-green); font-size:2.5rem; margin-bottom:0.5rem;">🔥 {{ streak }}</h3>
+                <p style="color:var(--text-secondary);">Day Streak</p>
             </div>
         </div>
+    </div>
 
-        <div class="cyber-panel" style="margin-top: 24px; animation-delay: 0.1s;">
-            <h3>Recent Activity</h3>
-            <ul style="list-style: none; margin-top: 20px;">
-                {% for tx in recent_transactions %}
-                <li style="padding: 16px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); display: flex; align-items: center; gap: 16px;">
-                    <span style="color: var(--accent-cyan); font-family: 'JetBrains Mono'; font-size: 0.85rem; background: rgba(6, 182, 212, 0.1); padding: 4px 8px; border-radius: 4px;">{{ tx.timestamp }}</span> 
-                    <span>{{ tx.summary }}</span>
-                </li>
-                {% else %}
-                <li style="color: var(--text-secondary); padding: 16px; text-align: center;">No recent activity found.</li>
-                {% endfor %}
-            </ul>
+    <div class="cyber-panel" style="margin-top:24px;">
+        <h3>Monthly Goal</h3>
+        <div style="margin-top:16px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                <span style="color:var(--text-secondary); font-size:0.85rem;">{{ monthly_used }} kg used</span>
+                <span style="color:var(--text-secondary); font-size:0.85rem;">{{ monthly_goal }} kg goal</span>
+            </div>
+            <div style="background:rgba(255,255,255,0.05); border-radius:2px; height:6px;">
+                <div style="height:6px; border-radius:2px; width:{{ [((monthly_used / monthly_goal) * 100)|int, 100]|min }}%;
+                            background:{% if monthly_used / monthly_goal > 0.85 %}var(--accent-red){% elif monthly_used / monthly_goal > 0.6 %}#f59e0b{% else %}var(--accent-green){% endif %};
+                            transition:width 0.5s ease;"></div>
+            </div>
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/mining-monitor.js') }}"></script>
-</body>
-</html>
+
+    <div class="cyber-panel" style="margin-top:24px;">
+        <h3>Recent Activity</h3>
+        <ul style="list-style:none; margin-top:20px;">
+            {% for tx in recent_transactions %}
+            <li style="padding:16px; border-bottom:1px solid var(--border-color);
+                        color:var(--text-primary); display:flex; align-items:center; gap:16px;">
+                <span style="color:var(--accent-cyan); font-family:'JetBrains Mono';
+                              font-size:0.85rem; background:rgba(6,182,212,0.1);
+                              padding:4px 8px; border-radius:4px;">{{ tx.timestamp }}</span>
+                <span>{{ tx.net }} kg CO2</span>
+                <span style="margin-left:auto; color:var(--accent-green);">Score: {{ tx.score }}/100</span>
+            </li>
+            {% else %}
+            <li style="color:var(--text-secondary); padding:16px; text-align:center;">
+                No entries yet. Log your first day.
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="cyber-panel" style="margin-top:24px;">
+        <h3>Algorand Wallet</h3>
+        <p style="color:var(--text-secondary); font-size:0.8rem; margin-top:12px;
+                   font-family:'JetBrains Mono'; word-break:break-all;">
+            {{ algo_address or 'No address found' }}
+        </p>
+        <p style="margin-top:8px; color:var(--text-secondary); font-size:0.8rem;">
+            Real GRC tokens on Algorand TestNet —
+            <a href="https://testnet.algoexplorer.io/address/{{ algo_address }}"
+               target="_blank" style="color:var(--accent-cyan);">View on Explorer ↗</a>
+        </p>
+    </div>
+
+</div>
+{% endblock %}

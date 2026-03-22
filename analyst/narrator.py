@@ -1,8 +1,7 @@
 import os
 import json
-import anthropic
+import requests
 from config import Config
-
 
 FALLBACK_TEMPLATE = """
 Based on your data: your average daily emission is {personal_avg}kg CO2, 
@@ -14,18 +13,11 @@ Focus area today: {dominant_category}.
 
 
 def generate_narrative(report: dict, user_state: str) -> str:
-    """
-    Takes the analyst report dict and returns a plain-English paragraph.
-    Uses Claude API if key is available, falls back to template otherwise.
-    """
-    api_key = Config.ANTHROPIC_API_KEY
-
+    api_key = os.getenv("GROQ_API_KEY", "")
     if not api_key:
         return _fallback_narrative(report, user_state)
 
     try:
-        client = anthropic.Anthropic(api_key=api_key)
-
         prompt = f"""You are a carbon footprint analyst embedded in an environmental tracking app.
 A user's daily data has been processed. Here is their structured report:
 
@@ -33,24 +25,31 @@ A user's daily data has been processed. Here is their structured report:
 
 Their state/region: {user_state}
 
-Write a 3-4 sentence analysis. Be direct, specific, and use the actual numbers.
-Tell them: what's happening with their emissions, one thing causing it, 
-and one specific action they can take today to improve their score or protect their streak.
-Do not use bullet points. Do not be generic. Sound like a real analyst, not a chatbot.
-If they have an anomaly today, acknowledge it but be calm about it.
-"""
+Write a 3-4 sentence analysis. Be direct, specific, use actual numbers.
+Tell them what's happening, one thing causing it, one specific action to improve.
+No bullet points. Sound like a real analyst, not a chatbot.
+If anomaly today, acknowledge it calmly."""
 
-        message = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=200,
-            messages=[{"role": "user", "content": prompt}]
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "llama3-8b-8192",
+                "messages": [{"role": "user", "content": prompt}],
+                "max_tokens": 200,
+                "temperature": 0.7
+            },
+            timeout=10
         )
-        return message.content[0].text.strip()
+        data = response.json()
+        return data["choices"][0]["message"]["content"].strip()
 
     except Exception as e:
-        print(f"Narrator API error: {e}")
+        print(f"Groq narrator error: {e}")
         return _fallback_narrative(report, user_state)
-
 
 def _fallback_narrative(report: dict, user_state: str) -> str:
     avg = report.get('personal_avg')

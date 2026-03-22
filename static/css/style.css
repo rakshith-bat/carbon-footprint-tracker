@@ -220,38 +220,8 @@ label {
     }
 }
 
-/* Mascot Area */
-.mascot-column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
 
-#robot-canvas {
-    width: 100%;
-    height: 500px;
-    border-radius: 4px;
-    background: radial-gradient(circle at center, rgba(0, 255, 157, 0.05) 0%, transparent 70%);
-    border: 1px solid rgba(0, 255, 157, 0.1);
-    margin-bottom: 20px;
-    box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
-}
 
-.mascot-message {
-    padding: 16px 24px;
-    background: rgba(0, 243, 255, 0.05);
-    border: 1px solid var(--accent-cyan);
-    border-radius: 4px;
-    color: var(--accent-cyan);
-    text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    backdrop-filter: blur(4px);
-    animation: float 4s ease-in-out infinite;
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
-}
 
 /* Ledger & Tables */
 .block-entry {
@@ -401,12 +371,47 @@ tr:hover td {
 ::-webkit-scrollbar-thumb:hover {
     background: #fff;
 }
-/* Robot canvas container */
-#robot-canvas {
-    width: 380px;
-    height: 480px;
-    position: relative;
+
+
+/* ── 3D Background Model ── */
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
 }
-canvas {
-    display: block;
+
+/* Allow drag on empty space */
+body.drag-active {
+    cursor: grabbing;
+}
+
+/* All UI floats above canvas */
+.nav-bar,
+.cyber-container,
+.cyber-panel,
+.mascot-column,
+.mascot-message {
+    position: relative;
+    z-index: 1;
+}
+
+/* Glass effect on panels over 3D background */
+.cyber-panel {
+    background: rgba(10, 10, 15, 0.72) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.nav-bar {
+    background: rgba(5, 5, 5, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+}
+select option {
+    background: #0a0a0a;
+    color: var(--text-primary);
 }

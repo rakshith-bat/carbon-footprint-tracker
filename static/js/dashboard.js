@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 showWarning(e.target, "Max 24 hours allowed");
             } else if (val < 0) {
                 e.target.value = 0;
-            }
+            } else if (val < 0.001 && val > 0) {
+                e.target.value = 0.001;
+}
         });
 
         input.addEventListener('blur', (e) => {

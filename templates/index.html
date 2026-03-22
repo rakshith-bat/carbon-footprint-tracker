@@ -1,160 +1,352 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CarbonChain | Tracker</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+{% extends "base.html" %}
+{% block title %}CarbonChain | Tracker{% endblock %}
 
-</head>
-<body>
-    <nav class="nav-bar">
-        <div class="logo">
-            <h1 style="margin: 0; font-size: 1.5rem;">CARBON_CHAIN <span style="font-size: 0.5em; color: var(--accent-green); vertical-align: middle;">v3.0</span></h1>
-        </div>
-        <div class="nav-links">
-            <a href="/index" class="active">Tracker</a>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/wallet">Wallet</a>
-            <a href="/ledger">Ledger</a>
-            <a href="/leaderboard">Leaderboard</a>
-            <a href="/logout" style="color: var(--accent-red);">Logout [{{ user }}]</a>
-        </div>
-    </nav>
+{% block head %}
+<style>
+    .float-cluster {
+        position: fixed;
+        pointer-events: all;
+        background: rgba(8, 8, 14, 0.78);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 255, 157, 0.18);
+        border-radius: 4px;
+        padding: 12px;
+        width: 190px;
+        z-index: 5;
+        overflow: hidden;
+    }
+    .float-cluster::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+        opacity: 0.5;
+    }
+    .float-cluster h4 {
+        font-size: 0.65rem;
+        color: var(--accent-green);
+        margin-bottom: 8px;
+        letter-spacing: 0.1em;
+    }
+    .float-cluster label { font-size: 0.65rem; margin-bottom: 2px; }
+    .float-cluster input,
+    .float-cluster select { font-size: 0.7rem; padding: 5px 8px; margin-bottom: 6px; }
 
-    <div class="cyber-container">
-        {% if error %}
-        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: center;">
-             {{ error }}
-        </div>
-        {% endif %}
+    /* No rotations — clean positions */
+    .cluster-transport  { top: 20%; left: 2%; }
+    .cluster-electric   { top: 20%; right: 2%; width: 200px; }
+    .cluster-food       { bottom: 18%; left: 2%; }
+    .cluster-renewables { bottom: 18%; right: 2%; width: 200px; }
+    .cluster-flight {
+        top: 50%; left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        width: 240px;
+        border-color: rgba(0, 243, 255, 0.2);
+    }
+    .cluster-flight::before {
+        background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    }
+    .cluster-flight h4 { color: var(--accent-cyan); }
 
-        <!-- Form wraps the entire grid to ensure all inputs are submitted -->
-        <form method="POST" id="emission-form" action="/index" onsubmit="document.getElementById('submit-btn').innerHTML = 'ENCRYPTING & UPLOADING...'; document.getElementById('submit-btn').classList.add('processing');">
-            <div class="dashboard-grid">
-                <!-- Left Column: Inputs -->
-                <div class="input-column cyber-panel" style="animation-delay: 0.1s;">
-                    <h3>Emission Sources</h3>
-                    <!-- Transport -->
-                    <div class="section" style="margin-bottom: 2rem;">
-                        <label class="tooltip">Transport Mode <span class="tooltiptext">Select your primary mode of travel today</span></label>
-                        <select name="transport_mode">
-                            <option value="public">Public Transport</option>
-                            <option value="car">Car (Gas)</option>
-                            <option value="ev">Electric Vehicle</option>
-                            <option value="bike">Bicycle/Walk</option>
-                        </select>
-                        <label>Distance Traveled (km)</label>
-                        <input type="number" name="distance" placeholder="e.g. 15.5" step="0.1" min="0">
-                    </div>
+    .streak-badge {
+        position: fixed; top: 80px; left: 24px; z-index: 5;
+        background: rgba(8,8,14,0.8); border: 1px solid var(--accent-cyan);
+        padding: 6px 14px; border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem; color: var(--accent-cyan);
+    }
+    .balance-badge {
+        position: fixed; top: 80px; right: 24px; z-index: 5;
+        background: rgba(8,8,14,0.8); border: 1px solid var(--accent-green);
+        padding: 6px 14px; border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem; color: var(--accent-green);
+    }
+    .mascot-msg {
+        position: fixed; top: 80px; left: 0; right: 0;
+        text-align: center;
+        z-index: 5;
+        pointer-events: none;
+    }
+    .mascot-msg span {
+        display: inline-block;
+        background: rgba(8,8,14,0.78);
+        border: 1px solid var(--accent-cyan);
+        padding: 8px 20px; border-radius: 4px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem; color: var(--accent-cyan);
+        white-space: nowrap;
+        animation: float 4s ease-in-out infinite;
+    }
+    .error-bar {
+        position: fixed; top: 120px; left: 50%;
+        transform: translateX(-50%); z-index: 20;
+        background: rgba(239,68,68,0.12);
+        border: 1px solid var(--accent-red);
+        color: var(--accent-red); padding: 8px 20px;
+        border-radius: 4px; font-size: 0.82rem;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    .locked-banner {
+        position: fixed; top: 50%; left: 50%;
+        transform: translate(-50%, -50%); z-index: 20;
+        background: rgba(8,8,14,0.94);
+        border: 1px solid var(--accent-cyan);
+        padding: 36px 52px; border-radius: 4px;
+        text-align: center; backdrop-filter: blur(16px);
+        min-width: 340px;
+    }
+</style>
+{% endblock %}
 
-                    <!-- Electricity -->
-                    <div class="section">
-                        <h4 style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.05em;">Daily Usage (Hours)</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                            <div>
-                                <label>AC</label>
-                                <input type="number" name="ac_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
-                            </div>
-                            <div>
-                                <label>Screen</label>
-                                <input type="number" name="screen_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
-                            </div>
-                            <div>
-                                <label>TV</label>
-                                <input type="number" name="tv_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
-                            </div>
-                            <div>
-                                <label>Lights</label>
-                                <input type="number" name="lighting_hours" class="hour-input" placeholder="0-24" step="0.5" min="0" max="24">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+{% block content %}
 
-                <!-- Center Column: Robot -->
-                <div class="mascot-column" style="animation-delay: 0.2s;">
-                    <div id="robot-canvas"></div>
-                    <div class="mascot-message" id="mascot-text">
-                        "System Online. Awaiting emission data for blockchain synchronization."
-                    </div>
-                    
-                    <div style="margin-top: 24px; display: flex; gap: 12px; width: 100%;">
-                        <a href="/leaderboard" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;"> Leaderboard</a>
-                        <a href="/wallet" class="cyber-btn" style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem;"> Wallet</a>
-                    </div>
-                    
-                    <button type="submit" id="submit-btn" class="cyber-btn glitch-btn" style="width: 100%; margin-top: 12px; height: 56px; font-size: 1rem;">
-                        COMMIT TO BLOCKCHAIN
-                    </button>
-                </div>
+<div class="streak-badge">🔥 {{ streak }} day streak</div>
+<div class="balance-badge">⬡ {{ balance }} GRC</div>
 
-                <!-- Right Column: Lifestyle & Renewables -->
-                <div class="input-column cyber-panel" style="animation-delay: 0.3s;">
-                    <h3>Lifestyle & Energy</h3>
-                    
-                    <!-- Food & Water -->
-                    <div class="section" style="margin-bottom: 2rem;">
-                        <label>Consumption</label>
-                        <input type="number" name="home_meals" placeholder="Home Cooked Meals" min="0">
-                        <input type="number" name="restaurant_meals" placeholder="Restaurant Meals" min="0">
-                        <input type="number" name="water_liters" placeholder="Processed Water (L)" min="0">
-                    </div>
+<div class="mascot-msg">
+    <span>
+        {% if locked %}✓ Today locked. Edit or return tomorrow.
+        {% else %}⬡ System Online. Awaiting emission data.{% endif %}
+    </span>
+</div>
+{% if error %}
+<div class="error-bar">⚠ {{ error }}</div>
+{% endif %}
 
-                    <!-- Renewables -->
-                    <div class="section">
-                        <label class="tooltip" style="margin-bottom: 1rem; display: block;">Renewable Generation <span class="tooltiptext">Electricity produced per day (units / kWh)</span></label>
-                        
-                        <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <label style="margin: 0;">Solar Power</label>
-                                <select name="has_solar" class="toggle-trigger" data-target="solar_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
-                                    <option value="no">No</option>
-                                    <option value="yes">Yes</option>
-                                </select>
-                            </div>
-                            <input type="number" name="solar_kwh" id="solar_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
-                        </div>
+{% if locked %}
+<div class="locked-banner">
+    <h3 style="color:var(--accent-cyan); margin-bottom:12px;">TODAY ALREADY LOGGED</h3>
+    <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:8px;">
+        Net: <span style="color:var(--accent-green);">{{ existing.net_emissions }} kg CO2</span>
+    </p>
+    <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:24px;">
+        Score: <span style="color:var(--accent-cyan);">{{ existing.eco_score }}/100</span>
+    </p>
+    <form method="POST" action="/index">
+        <input type="hidden" name="action" value="edit">
+        {% for k, v in existing.items() %}
+            {% if k == 'inputs' %}
+                {% for ik, iv in v.items() %}
+                <input type="hidden" name="{{ ik }}" value="{{ iv }}">
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="cyber-btn" style="width:100%;">EDIT TODAY'S ENTRY</button>
+    </form>
+</div>
 
-                        <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; margin-bottom: 12px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <label style="margin: 0;">Wind Power</label>
-                                <select name="has_wind" class="toggle-trigger" data-target="wind_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
-                                    <option value="no">No</option>
-                                    <option value="yes">Yes</option>
-                                </select>
-                            </div>
-                            <input type="number" name="wind_kwh" id="wind_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
-                        </div>
-                        
-                        <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <label style="margin: 0;">Biogas</label>
-                                <select name="has_biogas" class="toggle-trigger" data-target="biogas_kwh" style="width: auto; margin: 0; padding: 4px 8px;">
-                                    <option value="no">No</option>
-                                    <option value="yes">Yes</option>
-                                </select>
-                            </div>
-                            <input type="number" name="biogas_kwh" id="biogas_kwh" placeholder="Produced (kWh)" step="0.1" min="0" style="display: none; margin-top: 12px; margin-bottom: 0;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
+{% else %}
+<form method="POST" id="emission-form" action="/index"
+      onsubmit="document.getElementById('submit-btn').innerHTML='ENCRYPTING...';
+                document.getElementById('submit-btn').disabled=true;">
+
+    <!-- TRANSPORT — top left -->
+    <div class="float-cluster cluster-transport">
+        <h4>▸ TRANSPORT</h4>
+        <label>Mode</label>
+        <select name="transport_type">
+            <option value="petrol_car">Petrol Car</option>
+            <option value="diesel_car">Diesel Car</option>
+            <option value="cng_car">CNG Car</option>
+            <option value="petrol_bike">Petrol Bike</option>
+            <option value="ev_car">EV Car</option>
+            <option value="ev_bike">EV Bike</option>
+            <option value="metro">Metro</option>
+            <option value="ac_bus">AC Bus</option>
+            <option value="nonac_bus">Non-AC Bus</option>
+            <option value="auto">Auto Rickshaw</option>
+            <option value="local_train">Local Train</option>
+            <option value="cab">Cab / Ola / Uber</option>
+        </select>
+        <label>Distance (km)</label>
+        <input type="number" name="distance" placeholder="e.g. 12" step="0.1" min="0">
     </div>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.module.js",
-    "three/": "https://cdn.jsdelivr.net/npm/three@0.154.0/"
-  }
-}
-</script>
-<script type="module" src="/static/js/hero_robotv2.js"></script>
-<!-- 3⃣ Other scripts -->
-<script src="/static/js/dashboard.js"></script>
+    <!-- ELECTRICITY — top right -->
+    <div class="float-cluster cluster-electric">
+        <h4>▸ ELECTRICITY</h4>
+        <label>Monthly Bill (₹)</label>
+        <input type="number" name="monthly_bill" placeholder="e.g. 1200" step="1" min="0">
+        <label style="color:var(--text-secondary); font-size:0.65rem;">Grid: {{ user_state }}</label>
+        <label style="margin-top:6px;">AC Hours</label>
+        <input type="number" name="ac_hours" class="hour-input" placeholder="0–24" step="0.01" min="0" max="24">
+        <label>Screen Hours</label>
+        <input type="number" name="screen_hours" class="hour-input" placeholder="0–24" step="0.01" min="0" max="24">
+    </div>
 
-</body>
-</html>
-git 
+    <!-- FOOD & WASTE — bottom left -->
+<div class="float-cluster cluster-food">
+    <h4>▸ FOOD & WASTE</h4>
+    <label>Home Meals</label>
+    <input type="number" name="home_meals" placeholder="0" min="0">
+    <label>Restaurant Meals</label>
+    <input type="number" name="restaurant_meals" placeholder="0" min="0">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+        <div>
+            <label>Landfill (kg)</label>
+            <input type="number" name="waste_landfill_kg" placeholder="0"
+                   step="0.1" min="0" style="margin-bottom:0;">
+        </div>
+        <div>
+            <label>Recycled (kg)</label>
+            <input type="number" name="waste_recycled_kg" placeholder="0"
+                   step="0.1" min="0" style="margin-bottom:0;">
+        </div>
+    </div>
+</div>
+    <!-- RENEWABLES — bottom right -->
+    <div class="float-cluster cluster-renewables">
+        <h4>▸ RENEWABLES</h4>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="margin:0;">Solar</label>
+            <select name="has_solar" class="toggle-trigger" data-target="solar_kwh"
+                    style="width:auto; margin:0; padding:4px 8px;">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+        <input type="number" name="solar_kwh" id="solar_kwh"
+               placeholder="kWh produced" step="0.1" min="0"
+               style="display:none; margin-top:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <label style="margin:0;">Wind</label>
+            <select name="has_wind" class="toggle-trigger" data-target="wind_kwh"
+                    style="width:auto; margin:0; padding:4px 8px;">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+        <input type="number" name="wind_kwh" id="wind_kwh"
+               placeholder="kWh produced" step="0.1" min="0"
+               style="display:none; margin-top:6px;">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <label style="margin:0;">Biogas</label>
+            <select name="has_biogas" class="toggle-trigger" data-target="biogas_kwh"
+                    style="width:auto; margin:0; padding:4px 8px;">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+            </select>
+        </div>
+        <input type="number" name="biogas_kwh" id="biogas_kwh"
+               placeholder="kWh produced" step="0.1" min="0"
+               style="display:none; margin-top:6px;">
+    </div>
+
+    <!-- FLIGHTS — centre, optional -->
+    <!-- FLIGHTS — collapsible aeroplane button -->
+<div class="float-cluster cluster-flight" id="flight-cluster"
+     style="width:48px; height:48px; padding:0; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; transition: all 0.3s ease;
+            border-color:rgba(0,243,255,0.4); overflow:hidden;">
+
+    <!-- Icon shown when collapsed -->
+    <span id="flight-icon" style="font-size:1.4rem; line-height:1;">✈</span>
+
+    <!-- Content shown when expanded -->
+    <div id="flight-content" style="display:none; padding:12px; width:100%;">
+        <h4 style="color:var(--accent-cyan);">▸ FLIGHTS
+            <span style="color:var(--text-secondary); font-weight:normal;">(optional)</span>
+        </h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div>
+                <label>Type</label>
+                <select name="flight_type" style="margin-bottom:0;">
+                    <option value="">None</option>
+                    <option value="domestic">Domestic</option>
+                    <option value="international">International</option>
+                </select>
+            </div>
+            <div>
+                <label>Count</label>
+                <input type="number" name="flights_taken" placeholder="0" min="0" style="margin-bottom:0;">
+            </div>
+        </div>
+        <p style="color:var(--text-secondary); font-size:0.65rem; margin-top:6px; margin-bottom:0;">
+            Won't affect daily score
+        </p>
+    </div>
+</div>
+    <!-- ── Spread buttons ── -->
+    <a href="/leaderboard" class="cyber-btn" style="
+        position:fixed; bottom:48px; left:40px;
+        text-decoration:none; font-size:0.78rem;
+        border-color:rgba(0,255,157,0.4);
+        color:var(--text-secondary);
+        padding:10px 20px; letter-spacing:0.15em; z-index:10;">
+        ⬡ LEADERBOARD
+    </a>
+
+    <a href="/wallet" class="cyber-btn" style="
+        position:fixed; bottom:48px; left:210px;
+        text-decoration:none; font-size:0.78rem;
+        border-color:rgba(0,255,157,0.4);
+        color:var(--text-secondary);
+        padding:10px 20px; letter-spacing:0.15em; z-index:10;">
+        ◈ WALLET
+    </a>
+
+    <a href="/analyst" class="cyber-btn" style="
+        position:fixed; bottom:48px; right:210px;
+        text-decoration:none; font-size:0.78rem;
+        border-color:rgba(0,243,255,0.4);
+        color:var(--text-secondary);
+        padding:10px 20px; letter-spacing:0.15em; z-index:10;">
+        ◎ ANALYST
+    </a>
+
+    <a href="/dashboard" class="cyber-btn" style="
+        position:fixed; bottom:48px; right:40px;
+        text-decoration:none; font-size:0.78rem;
+        border-color:rgba(0,255,157,0.4);
+        color:var(--text-secondary);
+        padding:10px 20px; letter-spacing:0.15em; z-index:10;">
+        ◱ DASHBOARD
+    </a>
+
+    <button type="submit" id="submit-btn" class="cyber-btn glitch-btn" style="
+        position:fixed; bottom:32px; left:50%;
+        transform:translateX(-50%);
+        font-size:0.9rem; padding:16px 48px;
+        border-color:var(--accent-green);
+        color:var(--accent-green);
+        letter-spacing:0.2em; z-index:10;
+        box-shadow:0 0 30px rgba(0,255,157,0.15);
+        min-width:260px;">
+        COMMIT TO BLOCKCHAIN
+    </button>
+
+</form>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/dashboard.js"></script>
+<script>
+const fc = document.getElementById('flight-cluster');
+const fi = document.getElementById('flight-icon');
+const fcon = document.getElementById('flight-content');
+
+fc.addEventListener('mouseenter', () => {
+    fc.style.width = '240px';
+    fc.style.height = 'auto';
+    fc.style.borderRadius = '4px';
+    fc.style.padding = '0';
+    fi.style.display = 'none';
+    fcon.style.display = 'block';
+});
+
+fc.addEventListener('mouseleave', () => {
+    fc.style.width = '48px';
+    fc.style.height = '48px';
+    fc.style.borderRadius = '50%';
+    fi.style.display = 'block';
+    fcon.style.display = 'none';
+});
+</script>
+{% endblock %}

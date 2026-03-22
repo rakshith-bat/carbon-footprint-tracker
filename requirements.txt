@@ -2,4 +2,3 @@ Flask==2.3.2
 py-algorand-sdk
 python-dotenv
 requests
-anthropic

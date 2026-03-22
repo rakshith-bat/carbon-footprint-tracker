@@ -1,51 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CarbonChain | Leaderboard</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <nav class="nav-bar">
-        <div class="logo">
-            <h1 style="margin: 0; font-size: 1.5rem;">CARBON_CHAIN <span style="font-size: 0.5em; color: var(--accent-green); vertical-align: middle;">v2.0</span></h1>
-        </div>
-        <div class="nav-links">
-            <a href="/index">Tracker</a>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/wallet">Wallet</a>
-            <a href="/ledger">Ledger</a>
-            <a href="/leaderboard" class="active">Leaderboard</a>
-            <a href="/logout" style="color: var(--accent-red);">Logout</a>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block title %}CarbonChain | Leaderboard{% endblock %}
 
-    <div class="cyber-container">
-        <div class="cyber-panel">
-            <h2>Top Eco-Warriors</h2>
-            
-            <table style="width: 100%; margin-top: 20px;">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>User</th>
-                        <th>Green Credits</th>
-                        <th>Total Emissions (kg)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for stat in stats %}
-                    <tr>
-                        <td style="color: var(--accent-cyan); font-weight: bold;">#{{ loop.index }}</td>
-                        <td style="font-weight: 600;">{{ stat.username }}</td>
-                        <td style="color: var(--accent-green); font-family: 'JetBrains Mono';">{{ stat.balance }}</td>
-                        <td style="color: var(--accent-red); font-family: 'JetBrains Mono';">{{ stat.total_emissions }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+{% block content %}
+<div class="cyber-container">
+    <div class="cyber-panel">
+        <h2>Top Eco-Warriors</h2>
+        <table style="width:100%; margin-top:20px;">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>User</th>
+                    <th>GRC Balance</th>
+                    <th>Avg Daily (kg)</th>
+                    <th>This Month (kg)</th>
+                    <th>Streak</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in stats %}
+                <tr>
+                    <td style="color:var(--accent-cyan); font-weight:bold;">
+                        {% if loop.index == 1 %}🥇
+                        {% elif loop.index == 2 %}🥈
+                        {% elif loop.index == 3 %}🥉
+                        {% else %}#{{ loop.index }}{% endif %}
+                    </td>
+                    <td style="font-weight:600;">{{ stat.username }}</td>
+                    <td style="color:var(--accent-green); font-family:'JetBrains Mono';">{{ stat.balance }}</td>
+                    <td style="color:var(--accent-red); font-family:'JetBrains Mono';">{{ stat.avg_daily }}</td>
+                    <td style="color:var(--text-secondary); font-family:'JetBrains Mono';">{{ stat.monthly_used }}</td>
+                    <td style="color:var(--accent-cyan);">🔥 {{ stat.streak }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align:center; color:var(--text-secondary); padding:32px;">
+                        No users yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CarbonChain{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="logo">
+            <h1 style="margin:0; font-size:1.5rem;">CARBON_CHAIN
+                <span style="font-size:0.5em; color:var(--accent-green); vertical-align:middle;">v3.0</span>
+            </h1>
+        </div>
+        <div class="nav-links">
+            <a href="/index">Tracker</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/analyst">Analyst</a>
+            <a href="/wallet">Wallet</a>
+            <a href="/ledger">Ledger</a>
+            <a href="/leaderboard">Leaderboard</a>
+            <a href="/logout" style="color:var(--accent-red);">Logout</a>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.module.js",
+        "three/": "https://cdn.jsdelivr.net/npm/three@0.154.0/"
+      }
+    }
+    </script>
+    <script src="/static/js/dashboard.js"></script>
+    <script type="module" src="/static/js/hero_robotv2.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
