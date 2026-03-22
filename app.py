@@ -22,6 +22,9 @@ import sys
 import requests
 
 app = Flask(__name__)
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 app.secret_key = "super-secret-key"
 app.config.from_object(Config)
 
