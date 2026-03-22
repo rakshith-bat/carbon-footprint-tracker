@@ -15,16 +15,24 @@
             </h1>
         </div>
        <div class="nav-links">
+    {% set utype = session.get('user_type', 'consumer') %}
+    {% if session.get('user') %}
+        {% if utype == 'vendor' %}
+            <a href="/vendor">Dashboard</a>
+            <a href="/marketplace">Marketplace</a>
+            <a href="/wallet">Wallet</a>
+            <a href="/leaderboard">Leaderboard</a>
+        {% else %}
             <a href="/index">Tracker</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/analyst">Analyst</a>
             <a href="/wallet">Wallet</a>
             <a href="/ledger">Ledger</a>
             <a href="/leaderboard">Leaderboard</a>
-            {% if session.get('user') %}
-            <a href="/vendor" style="color:#9b00ff;">Vendor</a>
-            {% endif %}
-            <a href="/logout" style="color:var(--accent-red);">Logout</a>
+            <a href="/marketplace">Market</a>
+        {% endif %}
+        <a href="/logout" style="color:var(--accent-red);">Logout</a>
+    {% endif %}
 </div>
     </nav>
 

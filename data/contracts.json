@@ -1,0 +1,14 @@
+{
+  "c56d91e2": {
+    "id": "c56d91e2",
+    "vendor": "doss",
+    "energy_type": "petrol",
+    "quantity": 22.0,
+    "price_grc": 400.0,
+    "price_inr": 5000.0,
+    "duration_months": 2,
+    "description": "",
+    "posted_at": "2026-03-22",
+    "status": "open"
+  }
+}

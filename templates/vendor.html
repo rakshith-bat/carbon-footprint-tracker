@@ -1,98 +1,112 @@
 {% extends "base.html" %}
-{% block title %}CarbonChain | Vendor Dashboard{% endblock %}
+{% block title %}CarbonChain | Vendor{% endblock %}
 
 {% block content %}
 <div class="cyber-container">
 
     <div class="cyber-panel" style="margin-bottom:24px;">
-        <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
-            <h2 style="margin:0;">Energy Vendor</h2>
+        <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+            <h2 style="margin:0;">Vendor Dashboard</h2>
             <span style="background:rgba(0,255,157,0.1); border:1px solid var(--accent-green);
                           color:var(--accent-green); padding:4px 12px; border-radius:4px;
-                          font-family:'JetBrains Mono'; font-size:0.72rem;">
-                ⚡ CERTIFIED VENDOR
-            </span>
+                          font-family:'JetBrains Mono'; font-size:0.72rem;">⚡ CERTIFIED</span>
         </div>
-
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-            <div style="text-align:center; padding:32px;
-                         background:rgba(255,255,255,0.02); border-radius:4px;">
-                <h3 style="color:var(--accent-green); font-size:2.5rem; margin-bottom:8px;">
-                    {{ balance }}
-                </h3>
-                <p style="color:var(--text-secondary);">GRC Balance</p>
+            <div style="text-align:center; padding:24px; background:rgba(255,255,255,0.02); border-radius:4px;">
+                <h3 style="color:var(--accent-green); font-size:2rem;">{{ balance }} GRC</h3>
+                <p style="color:var(--text-secondary); font-size:0.8rem;">Balance</p>
             </div>
-            <div style="padding:24px; background:rgba(255,255,255,0.02); border-radius:4px;">
-                <p style="color:var(--text-secondary); font-size:0.75rem; margin-bottom:8px;">
-                    ALGORAND ADDRESS
-                </p>
+            <div style="padding:20px; background:rgba(255,255,255,0.02); border-radius:4px;">
+                <p style="color:var(--text-secondary); font-size:0.72rem; margin-bottom:6px;">ADDRESS</p>
                 <p style="color:var(--accent-cyan); font-family:'JetBrains Mono';
-                            font-size:0.75rem; word-break:break-all;">
-                    {{ algo_address }}
-                </p>
-                <a href="https://testnet.algoexplorer.io/address/{{ algo_address }}"
-                   target="_blank"
-                   style="color:var(--accent-green); font-size:0.72rem;
-                           margin-top:8px; display:block;">
-                    View on Explorer ↗
-                </a>
+                            font-size:0.72rem; word-break:break-all;">{{ algo_address }}</p>
             </div>
         </div>
     </div>
 
-    <!-- Send GRC rebate back to consumer -->
+    <!-- Post new contract -->
     <div class="cyber-panel" style="margin-bottom:24px;">
-        <h3 style="margin-bottom:20px;">Send GRC Rebate to Consumer</h3>
-        <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:20px;">
-            Reward consumers who buy your renewable energy by sending GRC back.
-        </p>
-        <form method="POST" action="/transfer">
-            <label>Select Consumer</label>
-            <select name="recipient">
-                {% for u in all_consumers %}
-                <option value="{{ u }}">{{ u }}</option>
-                {% else %}
-                <option disabled>No consumers registered yet</option>
-                {% endfor %}
-            </select>
-            <label>Amount (GRC)</label>
-            <input type="number" name="amount" step="0.01" min="0.01"
-                   placeholder="e.g. 5.00" max="{{ balance }}">
-            <button type="submit" class="cyber-btn"
-                    style="width:100%; margin-top:8px;">
-                SEND GRC REBATE
+        <h3 style="margin-bottom:20px;">Post Energy Contract</h3>
+        <form method="POST" action="/vendor">
+            <input type="hidden" name="action" value="post_contract">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div>
+                    <label>Energy Type</label>
+                    <select name="energy_type">
+                        <option value="kwh_block">Energy Block (kWh)</option>
+                        <option value="petrol">Petrol (Litres)</option>
+                        <option value="diesel">Diesel (Litres)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Quantity (units)</label>
+                    <input type="number" name="quantity" placeholder="e.g. 100" min="1" step="0.1">
+                </div>
+                <div>
+                    <label>Price (GRC)</label>
+                    <input type="number" name="price_grc" placeholder="e.g. 25" min="0.1" step="0.1">
+                </div>
+                <div>
+                    <label>Duration (months)</label>
+                    <input type="number" name="duration_months" placeholder="e.g. 12" min="1" max="60">
+                </div>
+            </div>
+            <label style="margin-top:12px;">Description</label>
+            <input type="text" name="description"
+                   placeholder="e.g. Solar kWh blocks from certified rooftop array, Tamil Nadu">
+            <button type="submit" class="cyber-btn" style="width:100%; margin-top:12px;">
+                POST CONTRACT
             </button>
         </form>
     </div>
 
+    <!-- My contracts -->
     <div class="cyber-panel">
-        <h3 style="margin-bottom:16px;">How It Works</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
-            <div style="padding:20px; background:rgba(0,255,157,0.03);
-                         border:1px solid rgba(0,255,157,0.1); border-radius:4px;">
-                <p style="color:var(--accent-green); font-family:'JetBrains Mono';
-                            font-size:0.72rem; margin-bottom:8px;">STEP 1</p>
-                <p style="color:var(--text-secondary); font-size:0.85rem;">
-                    Consumer logs renewable energy usage and earns GRC tokens
-                </p>
-            </div>
-            <div style="padding:20px; background:rgba(0,243,255,0.03);
-                         border:1px solid rgba(0,243,255,0.1); border-radius:4px;">
-                <p style="color:var(--accent-cyan); font-family:'JetBrains Mono';
-                            font-size:0.72rem; margin-bottom:8px;">STEP 2</p>
-                <p style="color:var(--text-secondary); font-size:0.85rem;">
-                    Consumer transfers GRC to vendor as payment for clean energy supply
-                </p>
-            </div>
-            <div style="padding:20px; background:rgba(155,0,255,0.03);
-                         border:1px solid rgba(155,0,255,0.2); border-radius:4px;">
-                <p style="color:#9b00ff; font-family:'JetBrains Mono';
-                            font-size:0.72rem; margin-bottom:8px;">STEP 3</p>
-                <p style="color:var(--text-secondary); font-size:0.85rem;">
-                    Vendor sends GRC rebate back — circular token economy on Algorand
-                </p>
-            </div>
-        </div>
+        <h3 style="margin-bottom:20px;">My Contracts</h3>
+        {% if my_contracts %}
+        <table style="width:100%;">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Qty</th>
+                    <th>Price (GRC)</th>
+                    <th>≈ INR</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in my_contracts %}
+                <tr>
+                    <td style="color:var(--accent-cyan);">{{ c.energy_type }}</td>
+                    <td>{{ c.quantity }}</td>
+                    <td style="color:var(--accent-green); font-family:'JetBrains Mono';">{{ c.price_grc }}</td>
+                    <td style="color:var(--text-secondary); font-family:'JetBrains Mono';">₹{{ c.price_inr }}</td>
+                    <td>{{ c.duration_months }}mo</td>
+                    <td style="color:{% if c.status == 'open' %}var(--accent-green){% else %}var(--text-secondary){% endif %};">
+                        {{ c.status|upper }}
+                    </td>
+                    <td>
+                        <form method="POST" action="/vendor" style="display:inline;">
+                            <input type="hidden" name="action" value="delete_contract">
+                            <input type="hidden" name="contract_id" value="{{ c.id }}">
+                            <button type="submit" class="cyber-btn"
+                                    style="padding:4px 10px; font-size:0.7rem;
+                                           border-color:var(--accent-red); color:var(--accent-red);">
+                                DELETE
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="color:var(--text-secondary); text-align:center; padding:24px;">
+            No contracts posted yet.
+        </p>
+        {% endif %}
     </div>
 
 </div>

@@ -4,41 +4,49 @@
 {% block content %}
 <div class="cyber-container">
     <div class="cyber-panel">
-        <h2>Top Eco-Warriors</h2>
+        <h2>{% if user_type == 'vendor' %}Top Energy Vendors{% else %}Top Eco-Warriors{% endif %}</h2>
         <table style="width:100%; margin-top:20px;">
             <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>User</th>
-                    <th>GRC Balance</th>
-                    <th>Avg Daily (kg)</th>
-                    <th>This Month (kg)</th>
-                    <th>Streak</th>
-                </tr>
-            </thead>
+    <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>GRC Balance</th>
+        {% if user_type == 'vendor' %}
+        <th>Contracts</th>
+        {% else %}
+        <th>Avg Daily (kg)</th>
+        <th>This Month (kg)</th>
+        <th>Streak</th>
+        {% endif %}
+    </tr>
+</thead>
             <tbody>
-                {% for stat in stats %}
-                <tr>
-                    <td style="color:var(--accent-cyan); font-weight:bold;">
-                        {% if loop.index == 1 %}🥇
-                        {% elif loop.index == 2 %}🥈
-                        {% elif loop.index == 3 %}🥉
-                        {% else %}#{{ loop.index }}{% endif %}
-                    </td>
-                    <td style="font-weight:600;">{{ stat.username }}</td>
-                    <td style="color:var(--accent-green); font-family:'JetBrains Mono';">{{ stat.balance }}</td>
-                    <td style="color:var(--accent-red); font-family:'JetBrains Mono';">{{ stat.avg_daily }}</td>
-                    <td style="color:var(--text-secondary); font-family:'JetBrains Mono';">{{ stat.monthly_used }}</td>
-                    <td style="color:var(--accent-cyan);">🔥 {{ stat.streak }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6" style="text-align:center; color:var(--text-secondary); padding:32px;">
-                        No users yet.
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+    {% for stat in stats %}
+    <tr>
+        <td style="color:var(--accent-cyan); font-weight:bold;">
+            {% if loop.index == 1 %}🥇
+            {% elif loop.index == 2 %}🥈
+            {% elif loop.index == 3 %}🥉
+            {% else %}#{{ loop.index }}{% endif %}
+        </td>
+        <td style="font-weight:600;">{{ stat.username }}</td>
+        <td style="color:var(--accent-green); font-family:'JetBrains Mono';">{{ stat.balance }}</td>
+        {% if user_type == 'vendor' %}
+        <td style="color:var(--accent-cyan);">—</td>
+        {% else %}
+        <td style="color:var(--accent-red); font-family:'JetBrains Mono';">{{ stat.avg_daily }}</td>
+        <td style="color:var(--text-secondary); font-family:'JetBrains Mono';">{{ stat.monthly_used }}</td>
+        <td style="color:var(--accent-cyan);">🔥 {{ stat.streak }}</td>
+        {% endif %}
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="6" style="text-align:center; color:var(--text-secondary); padding:32px;">
+            No users yet.
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
         </table>
     </div>
 </div>

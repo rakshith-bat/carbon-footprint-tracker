@@ -12,6 +12,7 @@ from algo.rewards import send_green_credits, get_user_token_balance
 from algo.ledger import record_emission_on_chain
 from algo.rewards import send_green_credits, get_user_token_balance, fund_new_wallet
 from algo.rewards import send_green_credits, get_user_token_balance, fund_new_wallet, transfer_credits
+from algo.marketplace import post_contract, get_open_contracts, get_vendor_contracts, delete_contract
 
 import os
 import datetime
@@ -82,7 +83,10 @@ def index():
         return redirect(url_for('login'))
 
     user = session['user']
+    
     user_data = user_manager.get_user(user)
+    if user_data.get('user_type') == 'vendor':
+        return redirect(url_for('vendor'))
     user_state = user_data.get('city', 'Other')
     today = datetime.date.today().isoformat()
 
@@ -204,6 +208,8 @@ def analyst():
         return redirect(url_for('login'))
 
     user = session['user']
+    if user_data.get('user_type') == 'vendor':
+        return redirect(url_for('vendor'))
     user_data = user_manager.get_user(user)
     user_state = user_data.get('city', 'Other')
     monthly_goal = user_data.get('monthly_goal', 300)
@@ -249,27 +255,38 @@ def wallet():
 
 @app.route('/leaderboard')
 def leaderboard():
-    users = user_manager.get_all_users()
-    stats = []
+    if 'user' not in session:
+        return redirect(url_for('login'))
 
-    for u in users:
+    current_user = session['user']
+    current_type = user_manager.get_user(current_user).get('user_type', 'consumer')
+    all_users = user_manager.get_all_users()
+
+    stats = []
+    for u in all_users:
         u_data = user_manager.get_user(u)
+        if u_data.get('user_type', 'consumer') != current_type:
+            continue
+
         algo_address = u_data.get('algo_address', '')
         balance = get_user_token_balance(algo_address) if algo_address else 0
         avg = get_personal_average(u)
         monthly = get_monthly_usage(u)
 
         stats.append({
-            'username': u,
-            'balance': round(balance, 2),
-            'avg_daily': avg or 0,
+            'username':     u,
+            'balance':      round(balance, 2),
+            'avg_daily':    avg or 0,
             'monthly_used': round(monthly, 2),
-            'streak': u_data.get('streak', 0)
+            'streak':       u_data.get('streak', 0),
+            'user_type':    current_type
         })
 
     stats.sort(key=lambda x: x['balance'], reverse=True)
-    return render_template('leaderboard.html', stats=stats)
-
+    return render_template('leaderboard.html',
+        stats=stats,
+        user_type=current_type
+    )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -297,6 +314,10 @@ def login():
         elif action == 'login':
             if user_manager.login(username, password):
                 session['user'] = username
+                u_data = user_manager.get_user(username)
+                session['user_type'] = u_data.get('user_type', 'consumer')
+                if u_data.get('user_type') == 'vendor':
+                    return redirect(url_for('vendor'))
                 return redirect(url_for('index'))
             return render_template('login.html', error="Invalid credentials")
 
@@ -363,9 +384,7 @@ def transfer():
         print(f"Transfer failed: {e}")
 
     return redirect(url_for('wallet'))
-
-
-@app.route('/vendor')
+@app.route('/vendor', methods=['GET', 'POST'])
 def vendor():
     if 'user' not in session:
         return redirect(url_for('login'))
@@ -379,13 +398,115 @@ def vendor():
     algo_address = user_data.get('algo_address', '')
     balance = get_user_token_balance(algo_address) if algo_address else 0
 
+    if request.method == 'POST':
+        action = request.form.get('action')
+
+        if action == 'post_contract':
+            post_contract(
+                vendor_username=user,
+                energy_type=request.form.get('energy_type'),
+                quantity=float(request.form.get('quantity', 0)),
+                price_grc=float(request.form.get('price_grc', 0)),
+                duration_months=int(request.form.get('duration_months', 1)),
+                description=request.form.get('description', '')
+            )
+
+        elif action == 'delete_contract':
+            delete_contract(request.form.get('contract_id'), user)
+
+        return redirect(url_for('vendor'))
+
+    my_contracts = get_vendor_contracts(user)
+
     return render_template('vendor.html',
         user=user,
         balance=round(balance, 2),
         algo_address=algo_address,
-        all_consumers=[u for u in user_manager.get_all_users()
-                       if user_manager.get_user(u).get('user_type') == 'consumer']
+        my_contracts=my_contracts
     )
+
+
+@app.route('/marketplace')
+def marketplace():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user = session['user']
+    user_data = user_manager.get_user(user)
+    algo_address = user_data.get('algo_address', '')
+    balance = get_user_token_balance(algo_address) if algo_address else 0
+    from algo.marketplace import get_open_contracts, get_contract_comparison
+    contracts = get_open_contracts()
+    user_state = user_data.get('city', 'Other')
+
+# Add price comparison to each contract
+    for c in contracts:
+        c['comparison'] = get_contract_comparison(c, user_state)
+
+    # Groq AI insight
+    narrative = ""
+    if contracts:
+        try:
+            import requests as req, os
+            prompt = f"""You are an energy market analyst. A user has {balance} GRC tokens 
+and is browsing energy contracts. Here are available contracts:
+{json.dumps(contracts, indent=2)}
+In 2-3 sentences, recommend which contract suits them best and why. Be specific, use numbers."""
+            resp = req.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {os.getenv('GROQ_API_KEY','')}",
+                         "Content-Type": "application/json"},
+                json={"model": "llama-3.1-8b-instant",
+                      "messages": [{"role": "user", "content": prompt}],
+                      "max_tokens": 150},
+                timeout=8
+            )
+            narrative = resp.json()["choices"][0]["message"]["content"].strip()
+        except Exception as e:
+            narrative = "AI insight unavailable. Compare contracts manually."
+
+    return render_template('marketplace.html',
+        user=user,
+        balance=round(balance, 2),
+        contracts=contracts,
+        narrative=narrative
+    )
+
+
+@app.route('/buy_contract/<contract_id>', methods=['POST'])
+def buy_contract(contract_id):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    user = session['user']
+    from algo.marketplace import load_contracts
+    contracts = load_contracts()
+    contract = contracts.get(contract_id)
+
+    if not contract or contract['status'] != 'open':
+        return redirect(url_for('marketplace'))
+
+    if contract['vendor'] == user:
+        return redirect(url_for('marketplace'))
+
+    buyer_data = user_manager.get_user(user)
+    vendor_data = user_manager.get_user(contract['vendor'])
+
+    buyer_address = buyer_data.get('algo_address')
+    buyer_key = user_manager.get_algo_private_key(user)
+    vendor_address = vendor_data.get('algo_address')
+
+    balance = get_user_token_balance(buyer_address)
+    if balance < contract['price_grc']:
+        return redirect(url_for('marketplace'))
+
+    try:
+        transfer_credits(buyer_address, buyer_key, vendor_address, contract['price_grc'])
+        close_contract(contract_id)
+    except Exception as e:
+        print(f"Contract purchase failed: {e}")
+
+    return redirect(url_for('marketplace'))
 
 if __name__ == '__main__':
     import threading
