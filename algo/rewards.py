@@ -95,7 +95,7 @@ def send_green_credits(user_address, amount_credits):
     print(f"Sent {amount_credits} GRC to {user_address} | TxID: {tx_id}")
     return tx_id
 
-    def fund_new_wallet(user_address):
+def fund_new_wallet(user_address):
     """Send a tiny amount of ALGO to a new user wallet to cover future fees."""
     client = get_algod_client()
     treasury_address, treasury_key = get_treasury()

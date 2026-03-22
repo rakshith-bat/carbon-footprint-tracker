@@ -1,28 +1,12 @@
 {
-    "dmitri": {
-        "password": "65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5",
-        "joined_at": "posix.times_result(user=0.25, system=0.06, children_user=0.0, children_system=0.0, elapsed=4298231.37)"
-    },
-    "kumar": {
-        "password": "8698df0ec492e5026b61ae25e429f82dea81eb962c5fbfa8ed3fd2ac72a968b2",
-        "joined_at": "posix.times_result(user=0.35, system=0.08, children_user=0.0, children_system=0.0, elapsed=4298288.21)"
-    },
-    "parth": {
-        "password": "5d5653c4eb4f09a3c5a14b499ceea37a9f025f9e7105c407eb09d81e6d4430c6",
-        "joined_at": "posix.times_result(user=0.42, system=0.1, children_user=0.0, children_system=0.0, elapsed=4298360.41)"
-    },
-    "abc": {
-        "password": "36bbe50ed96841d10443bcb670d6554f0a34b761be67ec9c4a8ad2c0c44ca42c",
-        "joined_at": "posix.times_result(user=3.2, system=7.64, children_user=0.0, children_system=0.0, elapsed=4296960.69)"
-    },
-    "sss11": {
-        "password": "f15e04c8588bb5c5e8b697bdb6a98100dec6800a5b586df85de42477e2a13439",
-        "joined_at": "posix.times_result(user=0.97, system=0.18, children_user=0.0, children_system=0.0, elapsed=4300999.22)",
+    "booo1": {
+        "password": "73ce0c65398ee4e47a92074e86905578939f3f1514b66bbf9ac0051845719167",
+        "joined_at": "posix.times_result(user=0.83, system=0.16, children_user=0.0, children_system=0.0, elapsed=4296747.77)",
         "city": "Other",
         "monthly_goal": 300.0,
         "streak": 0,
         "last_entry_date": null,
-        "algo_address": "AKSWUKE74LZUFMXD4W55ERXVYQ3IYOJX4TKNKVAXRSFJIRWM6PCH23BMWU",
-        "algo_mnemonic": "viable retire pudding photo session join crime shadow lawn arctic piece hazard curtain twice uncover any gold someone phrase wage riot travel puppy able blast"
+        "algo_address": "TDQCW62UFJ6FKI7FOHPXZRMOMWRKE5EDE375CTYFXKNQVLH426RT32GJSE",
+        "algo_mnemonic": "morning equal truly power half surprise idle escape damp scene divide cave cool health angry maze city royal right heart fade asthma aunt able select"
     }
 }
