@@ -48,7 +48,7 @@ cyanLight.position.set(-4, -2, 3);
 scene.add(cyanLight);
 
 // Purple from the left
-const purpleLight = new THREE.DirectionalLight(0x9b00ff, 1.8);
+const purpleLight = new THREE.DirectionalLight(0x9b00ff, 5);
 purpleLight.position.set(-8, 0, 2);
 scene.add(purpleLight);
 

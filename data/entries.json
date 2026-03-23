@@ -265,6 +265,29 @@
         "transport_type": "metro",
         "distance": "10"
       }
+    },
+    "2026-03-23": {
+      "gross_emissions": 2.52,
+      "renewable_offset": 0.0,
+      "net_emissions": 2.52,
+      "renewable_kwh": 0.0,
+      "eco_score": 83,
+      "breakdown": {
+        "electricity": 0.0,
+        "transport": 2.52,
+        "food": 0.0,
+        "waste": 0.0
+      },
+      "occasional": {},
+      "credits_earned": 16.5,
+      "timestamp": "2026-03-23",
+      "inputs": {
+        "transport_type": "petrol_car",
+        "distance": "12",
+        "has_solar": "no",
+        "has_wind": "no",
+        "has_biogas": "no"
+      }
     }
   }
 }

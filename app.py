@@ -524,15 +524,10 @@ if __name__ == '__main__':
     def run_5000():
         app.run(host="0.0.0.0", debug=True, port=5000, use_reloader=False)
 
-    def run_666():
-        app.run(host="0.0.0.0", debug=True, port=666, use_reloader=False)
-
+    
     t1 = threading.Thread(target=run_3000)
     t2 = threading.Thread(target=run_5000)
-    t3 = threading.Thread(target=run_666)
     t1.start()
     t2.start()
-    t3.start()
     t1.join()
     t2.join()
-    t3.join()
